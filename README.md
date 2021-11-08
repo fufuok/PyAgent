@@ -1,8 +1,8 @@
-# PyAgent (节点数据采集和监控报警客户端)
+# PyAgent (运维监控和指标采集客户端框架)
 
 ## 功能
 
-兼容 Windows/Linux, 长驻系统, 按插件收集指标数据和报警数据. 灵感来自于: `Telegraf`
+基于 asyncio 的高性能/插件式 Python Agent, 跨平台的运维监控和指标采集框架. 兼容 Windows/Linux, 灵感来自于: `Telegraf`
 
 - 配置动态加载
 - 插件式, 易扩展, 插件自动扫描/静态注册(默认)
