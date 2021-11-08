@@ -1,0 +1,16 @@
+# 采集时间间隔(秒)
+interval: 60
+# 超时秒数
+timeout: 5
+# 待 Telnet 目标
+target:
+  # 标记(唯一), 与报警配置的标记相同, 同时会在报警消息显示
+  百度80端口(IPv4):
+    # 目标地址和端口
+    address: baidu.com:80
+    # 该目标的超时秒数, 优先使用该值
+    timeout: 6
+    # True 时检测方式为 IPv6, 默认为 IPv4
+    ipv6: False
+  迅游网站 HTTPS 测试:
+    address: xunyou.com:443

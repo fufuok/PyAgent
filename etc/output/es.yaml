@@ -1,0 +1,8 @@
+# 默认的索引名(接口名)
+index: monitor_metric
+# 动态的索引名, 如: 数据标识为 alarm 的索引名
+index_alarm: monitor_metric_alarm
+# ES 上报接口地址, POST 数据到该 API
+url: http://data-router.demo.com:6600/v1/{es_index}/bulk
+# 数据推送时间间隔(秒)
+interval: 30

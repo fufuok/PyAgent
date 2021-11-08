@@ -1,0 +1,39 @@
+# 转换数据并新增字段(示例)
+use_plugin_converter:
+  # 转换函数
+  human_bytes:
+    # 待转换的字段集合, 精确匹配
+    fields_items:
+      - total
+      - used
+    # 待转换的字段前缀匹配
+    fields_prefix:
+      - bytes_
+    # 待转换的字段后缀匹配
+    fields_suffix:
+      - tamp
+    # 待转换的字段正则匹配
+    fields_regex:
+      - ^.*p.*e.*$
+      - in$
+      - k 中
+      # 无效正则, 忽略
+      - 1
+    # 转换失败或转换结果为假时使用默认值
+    default_value: 0
+    # 转换后字段名前缀, 有前缀或后缀时即新增字段
+    name_prefix: human_
+    # 转换后字段后缀
+    name_suffix: _kbps
+    # 是否删除原来的字段
+    delete_old: False
+    # 按字段单独配置, 优先使用
+    fields_conf:
+      bytes_recv:
+        default_value: 1
+        name_override: demo_new_name_recv
+        delete_old: True
+  # 另一个转换函数及配置...
+  get_comma:
+    fields_prefix:
+      - bytes_

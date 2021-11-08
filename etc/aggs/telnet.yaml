@@ -1,0 +1,11 @@
+alarm:
+  # 所有 telnet 目标不通都报警
+  all: true
+
+  # all = true 时无效, 指定不通要报警的标识
+  target:
+    # 标记名称与 input.telnet.yaml 中对应
+    - 百度80端口(IPv4)
+    - 迅游网站 HTTPS 测试
+    # 不存在的标记会被忽略
+    - tag3

@@ -1,0 +1,6 @@
+alarm:
+  # 报警描述信息
+  comment: 
+
+  # 内存使用占比
+  percent: 54.3333

@@ -1,0 +1,8 @@
+alarm:
+  # 报警描述信息
+  comment: CPU
+
+  # n 个数据中有 m 个数据 cpu 占用率达到 percent% 报警
+  n: 5
+  m: 4
+  percent: 52.3

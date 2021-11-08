@@ -1,0 +1,18 @@
+# 采集时间间隔(秒)
+interval: 60
+# 请求目标配置
+target:
+  # 请求的标记, 唯一, 与报警设置的标记对应
+  百度(GET):
+    # 请求的 URL
+    url: http://baidu.com
+    # 默认为 get 请求
+    method: get
+  示例(POST):
+    url: http://baidu.com
+    method: post
+    type: json
+    # 请求的数据(键值对)
+    data:
+      code: curl_post
+      a: 32

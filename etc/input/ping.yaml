@@ -1,0 +1,24 @@
+# 采集时间间隔(秒)
+interval: 60
+# 间隔时间内采集样本数, 默认值: 30
+# count: 30
+# 每次 PING 超时时间 (秒), 默认值: 0.7 秒 (700 毫秒), 表示 700ms 以上的 PING 判定为超时
+# 类似 Windows: ping -w 700 8.8.8.8
+# timeout: 0.7
+# 每次 PING 间隔时间 (秒), 默认值: 0.1 秒, 表示每次 PING 完后 0.1 秒进行下一次 PING
+# 类似 Linux: ping -i 0.1 8.8.8.8
+# interval_ping: 0.1
+
+target:
+  测试网络不通:
+    address: 123.0.0.45
+  114DNS:
+    address: 114.114.114.114
+  谷歌DNS:
+    address: 8.8.8.8
+  荷兰弗莱福兰:
+    address: 91.243.80.33
+  乌克兰苏梅:
+    address: 95.47.163.1
+  阿里IPv6DNS:
+    address: 2400:3200::1

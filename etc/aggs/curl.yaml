@@ -1,0 +1,38 @@
+alarm:
+  # 报警描述信息
+  comment: CRUL 插件报警描述信息
+
+  # 公共报警配置, 所有请求的结果不满足任一条件时报警, 共 5 种报警方案
+  all:
+    # 1. 状态码检查, 如: 200 或 301 则正常
+    status:
+      - 200
+      - 301
+      - 302
+
+    # 2. 返回值包含
+    #contains: abc
+
+    # 3. 返回值必须为 JSON
+    #json:
+
+    # 4. 返回值必须为 JSON, 且值相等
+    #json:
+    #  ok: 1
+
+    # 5. 响应头包含键值对
+    #header:
+    #  Server: nginx
+
+  # 指定标识报警, 规则设置方法与上面一致, 仅生效于对应的标记
+  target:
+    百度(GET):
+      # 返回值包含
+      contains: baidu.com
+    示例(POST):
+      # 返回值必须为 JSON, 且值相等
+      json:
+        ok: 1
+      # 响应头包含
+      header:
+        Server: DataRouter

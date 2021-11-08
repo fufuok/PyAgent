@@ -1,0 +1,18 @@
+alarm:
+  # 公用报警（检测全部目标）
+  # 平均延时 >=
+  #average: 100
+  # 丢包比例 >=
+  loss: 100
+  # 最大延时 >=
+  #maximum: 150
+
+  target:
+    测试网络不通:
+      average: 400
+    谷歌IP:
+      average: 350
+      loss: 40
+      maximum: 400
+    荷兰弗莱福兰:
+      loss: 50

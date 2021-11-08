@@ -1,0 +1,122 @@
+# 单文件配置示例
+# 是否开启 Debug 模式, 默认关闭
+debug: True
+# 配置热加载周期, 秒, 默认 60 秒
+reload_sec: 60
+
+# (必须) 本机标识信息
+info:
+  # 主 IP, 数据项唯一标识
+  node_ip: 0.0.0.1
+  # 主机名
+  host: Host001
+
+# (必须) 启用的数据收集插件 (重启生效*)
+open:
+  # - demo
+  - mem
+  - cpu
+  - disk
+  - network
+  # - curl
+  - telnet
+  - ping
+
+# 公共输出插件 (重启生效*)
+common_output:
+  - console
+  # - es
+
+# (必须) (公共的) 时间间隔, 秒
+interval: 60
+
+# (必须) (公共的) 报警数据相关参数
+alarm:
+  code: monitor_metric_alarm
+
+########## 以下是插件相关默认配置, 单独的插件配置文件优先(插件配置必须是字典, 配置区分大小写!!!) ##########
+
+# 输入插件默认配置
+input:
+  demo:
+    # 间隔时间生成一个随机数
+    interval: 3
+  network:
+    # 采集指定网卡名
+    network_card:
+      - 本地连接
+      - 以太网
+  ping:
+    target:
+      测试网络不通:
+        address: 123.0.0.45
+      114DNS:
+        address: 114.114.114.114
+  telnet:
+    # 超时秒数
+    timeout: 5
+    # 待 Telnet 目标
+    target:
+      # 标记(唯一), 与报警配置的标记相同, 同时会在报警消息显示
+      迅游网站 HTTPS 测试:
+        address: xunyou.com:443
+
+# 数据处理插件默认配置
+processor:
+  # 转换数据并新增字段(示例)
+  use_plugin_converter:
+    # 转换函数
+    human_bytes:
+      # 待转换的字段集合, 精确匹配
+      fields_items:
+        - total
+      # 待转换的字段后缀匹配
+      fields_suffix:
+        - tamp
+      # 待转换的字段正则匹配
+      fields_regex:
+        - in$
+      name_prefix: human_
+      # 转换后字段后缀
+      name_suffix: _kbps
+      # 是否删除原来的字段
+      delete_old: False
+
+# 数据聚合/报警插件默认配置
+aggs:
+  cpu:
+    alarm:
+      # n 个数据中有 m 个数据 cpu 占用率达到 percent% 报警
+      n: 5
+      m: 4
+      percent: 52.3
+  mem:
+    alarm:
+      # 内存使用占比
+      percent: 54.3333
+  network:
+    alarm:
+      # 报警的接口名称
+      以太网:
+        # 报警描述信息
+        comment: 业务量大
+        # 该接口的流入带宽报警阈值, >=
+        kbps_in: 7777
+        # 流出带宽报警阈值, >=
+        kbps_out: 7777
+  disk:
+    alarm:
+      # 默认使用率报警阈值, >=, (无指定盘符配置时, 针对所有盘符报警)
+      percent: 80
+  ping:
+    alarm:
+      # 公用报警（检测全部目标）
+      # 丢包比例 >=
+      loss: 100
+  telnet:
+    alarm:
+      # 所有 telnet 目标不通都报警
+      all: true
+
+# 输出插件默认配置
+output:

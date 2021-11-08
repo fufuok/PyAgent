@@ -1,0 +1,43 @@
+# 是否开启 Debug 模式, 默认关闭
+debug: True
+# 配置热加载周期, 秒, 默认 60 秒
+reload_sec: 60
+
+# (必须) 本机标识信息
+info:
+  # 主 IP, 数据项唯一标识
+  node_ip: 0.0.0.1
+  # 主机名
+  host: Host001
+
+# (必须) 启用的数据收集插件 (重启生效*)
+open:
+  # - demo
+  - mem
+  - cpu
+  - disk
+  - network
+  # - curl
+  - telnet
+  - ping
+
+# 公共输出插件 (重启生效*)
+common_output:
+  - console
+  # - es
+
+# (必须) (公共的) 时间间隔, 秒
+interval: 60
+
+# (必须) (公共的) 报警数据相关参数
+alarm:
+  code: monitor_metric_alarm
+
+########## 以下是插件相关默认配置, 单独的插件配置文件优先(插件配置必须是字典, 配置区分大小写!!!) ##########
+
+# 输出插件默认配置
+output:
+  # 输出插件名
+  demo:
+    # 输出插件的配置项, 以下内容与单独的配置文件内容相同
+    key: value
