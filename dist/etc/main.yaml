@@ -42,10 +42,14 @@ input:
     # 间隔时间生成一个随机数
     interval: 3
   network:
-    # 采集指定网卡名
+    # 采集指定网卡名(默认采集所有网卡)
     network_card:
       - 本地连接
       - 以太网
+    # 指定采集网卡的前缀名
+    network_card_prefix:
+      - eth
+      - ens
   ping:
     target:
       测试网络不通:

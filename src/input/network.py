@@ -4,16 +4,18 @@
     ~~~~~~~~
     网络信息收集插件
 
-    :author: kerrygao 2021/6/10
+    :author: kerrygao, 2021/6/10
+    :update: Fufu, 2021/11/8 代码重构, 支持网卡前缀配置和多 IP
 """
+import time
 from asyncio import create_task, get_running_loop, sleep
 
 import psutil
 
 from . import InputPlugin
-from ..libs.converter import get_comma
-from ..libs.helper import get_int, get_round
+from ..libs.helper import get_round, get_comma, get_int
 from ..libs.humanize import human_bps
+from ..libs.psutil import to_dict
 
 
 class Network(InputPlugin):
@@ -22,8 +24,8 @@ class Network(InputPlugin):
     # 模块名称
     name = 'network'
 
-    # 存储上一分钟 网卡数据
-    before_one_minute = dict()
+    # 存储上一时间的网卡数据
+    last_data = {}
 
     async def run(self):
         """定时执行收集"""
@@ -39,77 +41,85 @@ class Network(InputPlugin):
         """获取网络信息"""
         # 获取网口的流量
         net_io_counters = psutil.net_io_counters(pernic=True)
+        if not self.last_data:
+            self.last_data = {nic: to_dict(data) for nic, data in net_io_counters.items()}
+            self.last_data['last_time'] = time.time()
+            return
+
+        # 获取待采集的网卡列表
+        nic_list = self.get_nic_list(net_io_counters.keys())
+
+        # 时间间隔
+        now = time.time()
+        interval = now - self.last_data['last_time']
+        self.last_data['last_time'] = time.time()
+        if interval < 0:
+            return
+
         # 获取网卡的信息
         net_if_addrs = psutil.net_if_addrs()
         # 获取网络接口的状态
         net_if_stats = psutil.net_if_stats()
-        network_card_list = self.get_plugin_conf_value('network_card', [])
-        interval = self.get_interval(60)
-        for item in net_io_counters.items():
-            network_card_name = item[0]
-            net_if_addrs_item = net_if_addrs.get(item[0])
-            net_if_stats_item = net_if_stats.get(item[0])
-            duplex = net_if_stats_item.duplex
-            isup = net_if_stats_item.isup
-            mtu = net_if_stats_item.mtu
-            speed = net_if_stats_item.speed
 
-            ipv4 = ''
-            ipv6 = ''
-            mac = ''
+        for nic in nic_list:
+            now_nic_data = to_dict(net_io_counters[nic])
+            last_nic_data = self.last_data.get(nic, {})
+            self.last_data[nic] = now_nic_data
+            if not last_nic_data:
+                # 新网卡
+                continue
+            self.gen_metric(interval, nic, now_nic_data, last_nic_data, net_if_addrs, net_if_stats)
 
-            for addr in net_if_addrs_item:
-                family = str(addr.family)
-                if family == 'AddressFamily.AF_LINK':
-                    mac = addr.address
-                elif family == 'AddressFamily.AF_INET':
-                    ipv4 = addr.address
-                elif family == 'AddressFamily.AF_INET6':
-                    ipv6 = addr.address
+    def get_nic_list(self, all_nic: list) -> set:
+        """获取待采集的网卡列表"""
+        nic_list = set()
 
-            network_card_info = self.before_one_minute.get(network_card_name)
+        # 配置中指定的要采集的网卡
+        conf_nic_list = self.get_plugin_conf_value('network_card', [])
+        if conf_nic_list:
+            nic_list = set(conf_nic_list).intersection(set(all_nic))
 
-            if network_card_info:
-                if not network_card_list or network_card_name in network_card_list:
-                    bps_in = get_round((item[1].bytes_recv - network_card_info["bytes_recv"]) * 8 / interval)
-                    bps_out = get_round((item[1].bytes_sent - network_card_info["bytes_sent"]) * 8 / interval)
-                    pps_in = get_int((item[1].packets_recv - network_card_info["packets_recv"]) / interval)
-                    pps_out = get_int((item[1].packets_sent - network_card_info["packets_sent"]) / interval)
+        # 配置中指定的要采集的网卡前缀
+        nic_prefix_list = self.get_plugin_conf_value('network_card_prefix', [])
+        for prefix in nic_prefix_list:
+            nic_list.update([x for x in all_nic if str(x).startswith(prefix)])
 
-                    net_info = {
-                        "network_card_name": network_card_name,
-                        "duplex": duplex,
-                        "isup": isup,
-                        "mtu": mtu,
-                        "speed": speed,
-                        "ipv4": ipv4,
-                        "ipv6": ipv6,
-                        "mac": mac,
-                        "bytes_recv": item[1].bytes_recv,
-                        "bytes_sent": item[1].bytes_sent,
-                        "kbps_in": get_round(bps_in / 1000),
-                        "kbps_out": get_round(bps_out / 1000),
-                        "human_kbps_in": human_bps(bps_in),
-                        "human_kbps_out": human_bps(bps_out),
-                        "dropin": item[1].dropin,
-                        "dropout": item[1].dropout,
-                        "errin": item[1].errin,
-                        "errout": item[1].errout,
-                        "packets_recv": item[1].packets_recv,
-                        "packets_sent": item[1].packets_sent,
-                        "pps_in": pps_in,
-                        "pps_out": pps_out,
-                        "comma_pps_in": get_comma(pps_in),
-                        "comma_pps_out": get_comma(pps_out)
-                    }
-                    self.out_queue.put_nowait(self.metric(net_info))
+        return nic_list
 
-            before_one_minute_info = {
-                "bytes_recv": item[1].bytes_recv,
-                "bytes_sent": item[1].bytes_sent,
-                "packets_recv": item[1].packets_recv,
-                "packets_sent": item[1].packets_sent
-            }
-            self.before_one_minute.update({
-                network_card_name: before_one_minute_info
-            })
+    def gen_metric(
+            self,
+            interval,
+            nic: str,
+            now_nic_data: dict,
+            last_nic_data: dict,
+            net_if_addrs: dict,
+            net_if_stats: dict
+    ) -> None:
+        """生成指标数据"""
+        metric = {
+            'nic': nic,
+            'interval': interval,
+        }
+        metric.update(to_dict(net_if_stats[nic]))
+        for snic in net_if_addrs[nic]:
+            if snic.family.name in ('AF_LINK', 'AF_PACKET'):
+                metric['mac'] = snic.address
+            elif snic.family.name == 'AF_INET':
+                metric['ipv4'] = f'{metric["ipv4"]},{snic.address}' if 'ipv4' in metric else snic.address
+            elif snic.family.name == 'AF_INET6':
+                metric['ipv6'] = f'{metric["ipv6"]},{snic.address}' if 'ipv6' in metric else snic.address
+
+        metric.update(now_nic_data)
+        metric['bps_in'] = get_round((now_nic_data['bytes_recv'] - last_nic_data['bytes_recv']) * 8 / interval)
+        metric['bps_out'] = get_round((now_nic_data['bytes_sent'] - last_nic_data['bytes_sent']) * 8 / interval)
+        metric['pps_in'] = get_int((now_nic_data['packets_recv'] - last_nic_data['packets_recv']) / interval)
+        metric['pps_out'] = get_int((now_nic_data['packets_sent'] - last_nic_data['packets_sent']) / interval)
+
+        metric['kbps_in'] = get_round(metric['bps_in'] / 1000)
+        metric['kbps_out'] = get_round(metric['bps_out'] / 1000)
+        metric['human_kbps_in'] = human_bps(metric['bps_in'])
+        metric['human_kbps_out'] = human_bps(metric['bps_out'])
+        metric['comma_pps_in'] = get_comma(metric['pps_in'])
+        metric['comma_pps_out'] = get_comma(metric['pps_out'])
+
+        self.out_queue.put_nowait(self.metric(metric))

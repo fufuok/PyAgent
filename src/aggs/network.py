@@ -17,20 +17,20 @@ class Network(AggsPlugin):
     async def alarm(self, metric):
         """报警"""
         # 网卡名
-        network_card_name = metric.get('network_card_name')
+        nic = metric.get('nic')
 
         # 流入带宽报警
-        kbps_in_limit = self.get_plugin_conf_value(f'alarm|{network_card_name}|kbps_in', -0.1)
+        kbps_in_limit = self.get_plugin_conf_value(f'alarm|{nic}|kbps_in', -0.1)
         if kbps_in_limit >= 0:
-            kbps_in = metric.get('kbps_in')
+            kbps_in = metric.get('kbps_in', 0.0)
             if kbps_in >= kbps_in_limit:
-                more = self.get_plugin_conf_value(f'alarm|{network_card_name}|comment', '')
-                self.put_alarm_metric(f'{network_card_name} 流入带宽(kbps): {kbps_in}>{kbps_in_limit}', more=more)
+                more = self.get_plugin_conf_value(f'alarm|{nic}|comment', '')
+                self.put_alarm_metric(f'{nic} 流入带宽(kbps): {kbps_in}>{kbps_in_limit}', more=more)
 
         # 流出带宽报警
-        kbps_out_limit = self.get_plugin_conf_value(f'alarm|{network_card_name}|kbps_out', -0.1)
+        kbps_out_limit = self.get_plugin_conf_value(f'alarm|{nic}|kbps_out', -0.1)
         if kbps_out_limit >= 0:
-            kbps_out = metric.get('kbps_out')
+            kbps_out = metric.get('kbps_out', 0.0)
             if kbps_out >= kbps_out_limit:
-                more = self.get_plugin_conf_value(f'alarm|{network_card_name}|comment', '')
-                self.put_alarm_metric(f'{network_card_name} 流出带宽(kbps): {kbps_out}>{kbps_out_limit}', more=more)
+                more = self.get_plugin_conf_value(f'alarm|{nic}|comment', '')
+                self.put_alarm_metric(f'{nic} 流出带宽(kbps): {kbps_out}>{kbps_out_limit}', more=more)
