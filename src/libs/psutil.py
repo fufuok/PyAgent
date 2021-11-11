@@ -4,14 +4,21 @@
     ~~~~~~~~
     psutil 助手函数
 
-    :author: kerrygao 2021/6/23
+    :author: Fufu, 2021/11/10
 """
 
 
 def to_dict(obj):
     """对象转字典"""
-    tmp_dict = dict()
-    for field in obj._fields:
-        v = getattr(obj, field)
-        tmp_dict.update({field: v})
-    return tmp_dict
+    if hasattr(obj, '_asdict'):
+        return obj._asdict()
+
+    if hasattr(obj, '_fields'):
+        return dict(zip(obj._fields, obj))
+
+    try:
+        return dict(obj)
+    except BaseException:
+        pass
+
+    return {}
