@@ -64,7 +64,7 @@ class Worker:
 
 async def main() -> None:
     """程序入口"""
-    logger.info('PyAgent({}) start working...', 'v0.0.1')
+    logger.info('PyAgent({}) start working...', 'v0.0.3')
 
     for name in CONF.main.get('open', []):
         # 数据采集插件
@@ -77,6 +77,6 @@ async def main() -> None:
         create_task(Worker(name).run(cls_input))
 
     while True:
-        # 配置热加载
-        await sleep(CONF.reload_sec)
+        await CONF.update()
         CONF.reload()
+        await sleep(CONF.reload_sec)

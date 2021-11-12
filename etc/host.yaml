@@ -1,0 +1,15 @@
+aggs:
+  cpu:
+    alarm:
+      m: 4
+      n: 5
+      percent: 23
+  disk:
+    alarm:
+      percent: 23
+  mem:
+    alarm:
+      percent: 23
+info:
+  host: LOCAL-TEST
+  node_ip: 127.0.0.1

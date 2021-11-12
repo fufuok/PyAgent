@@ -4,7 +4,7 @@
 
 基于 asyncio 的高性能/插件式 Python Agent, 跨平台的运维监控和指标采集框架. 兼容 Windows/Linux, 灵感来自于: `Telegraf`
 
-- 配置动态加载
+- 配置远程管理, 自动拉取更新, 动态加载
 - 插件式, 易扩展, 插件自动扫描/静态注册(默认)
 - 轻量协程, 资源占用低, 若有阻塞类代码请放入线程执行
 - 脚手架, 请根据业务需要编写插件即可
@@ -13,6 +13,18 @@
 ## 依赖
 
 兼容 `Python-3.8.5+`, 依赖见: [requirements.txt](requirements.txt)
+
+## 配置
+
+若要使用自动拉取配置, 请参考 `src/conf/config.py` 中的 `update()` 方法接入自己的配置中心接口.
+
+配置文档采用 YAML 格式, 系统有 3 重可选配置, 优先级为:
+``
+```
+各插件本地目录(input/processor/aggs/output)
+  > host.yaml(适配在线管理的基于主机 IP 的配置)
+    > main.yaml(适配在线管理的全局默认配置, 针对所有主机)
+```
 
 ## 使用
 
@@ -45,7 +57,7 @@ root@DevBeta:~/py/pyagent# python3 main.py
 
 或用 `pyinstaller` 打包后运行, 配置文件目录 `etc` 与 `main.exe` 放在同一目录.
 
-(注: 若要打包请看: `src/conf/config.py` 第 60 行注释, 如果要在 Windows 7 或 2008 上运行, 最好使用 Python-3.8)
+(注: 若要打包请看: `src/conf/config.py` 第 65 行注释, 如果要在 Windows 7 或 2008 上运行, 最好使用 Python-3.8)
 
 `dist` 是单配置文件示例, 解压后运行 `main.exe` 即可.
 
@@ -86,10 +98,7 @@ pyinstaller -p E:\Python\github\PyAgent\venvw\Lib\site-packages -F main.py -i do
 
 ![PyAgent](doc/pyagent.png)
 
-## TODO
 
-- [ ] 配置远程管理
-- [ ] 插件动态加载
 
 
 

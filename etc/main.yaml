@@ -1,7 +1,10 @@
 # 是否开启 Debug 模式, 默认关闭
 debug: True
-# 配置热加载周期, 秒, 默认 60 秒
-reload_sec: 60
+
+# 配置热加载周期, 秒, 默认 300 秒, 最小 10 秒
+reload_sec: 300
+# 配置获取 API, 为空或注释掉则不主动拉取配置
+# update_api: http://api.demo.com/api/get_pyagent_config
 
 # (必须) 本机标识信息
 info:
@@ -29,9 +32,14 @@ common_output:
 # (必须) (公共的) 时间间隔, 秒
 interval: 60
 
-# (必须) (公共的) 报警数据相关参数
+# (公共的) 报警数据相关参数
 alarm:
   code: monitor_metric_alarm
+
+# 日志配置, 可配置文件日志路径, 级别, 滚动大小, 格式等
+log:
+  # 日志级别, 默认 INFO: CRITICAL ERROR WARNING SUCCESS INFO DEBUG
+  level: INFO
 
 ########## 以下是插件相关默认配置, 单独的插件配置文件优先(插件配置必须是字典, 配置区分大小写!!!) ##########
 
