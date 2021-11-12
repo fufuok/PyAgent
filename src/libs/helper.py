@@ -10,13 +10,13 @@ import hashlib
 import json
 import re
 import socket
-from collections import Callable
+from copy import deepcopy
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from functools import wraps
 from inspect import isfunction
 from itertools import chain
-from typing import Any, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 from loguru import logger
 
@@ -617,3 +617,40 @@ def get_comma(n: Union[int, float]) -> str:
 def get_bool(v: Any) -> bool:
     """转换为布尔值"""
     return str(v) in ('1', 't', 'T', 'true', 'TRUE', 'True')
+
+
+def extend_dict(a: dict, b: dict, merge_sub_dict: bool = True) -> dict:
+    """
+    深拷贝, 扩展合并字典
+    默认包含对下级字典合并, 保留只在 a 中存在的键值
+    合并失败时, 返回空字典
+
+    e.g.::
+
+        a = {'a': {'a1': 1, 'a2': 2}, 'b': 3, 'e': 7}
+        b = {'a': {'a1': 'f', 'a3': 3}, 'b': {'b1': 5}, 'd': 6}
+
+        # {'a': {'a1': 'f', 'a3': 3, 'a2': 2}, 'b': {'b1': 5}, 'e': 7, 'd': 6}
+        z = extend_dict(a, b)
+
+        # {'a': {'a1': 'f', 'a3': 3}, 'b': {'b1': 5}, 'e': 7, 'd': 6}
+        z = extend_dict(a, b, False)
+
+    :param a:
+    :param b:
+    :param merge_sub_dict: True, 扩展合并下一级的字典
+    :return:
+    """
+    try:
+        c = deepcopy(a)
+        c.update(deepcopy(b))
+    except Exception:
+        return {}
+
+    if merge_sub_dict:
+        for k in list(c.keys()):
+            if isinstance(c[k], dict):
+                d = get_dict_value(a, k, {})
+                d and c[k].update({x: y for x, y in d.items() if x not in c[k]})
+
+    return c
