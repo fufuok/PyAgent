@@ -21,8 +21,8 @@ class Cpu(AggsPlugin):
         """报警"""
         n = self.get_plugin_conf_value('alarm|n', 0)
         m = self.get_plugin_conf_value('alarm|m', 0)
-        percent = self.get_plugin_conf_value('alarm|percent', 0.0)
-        if n <= 0 or m <= 0 or percent <= 0:
+        conf_percent = self.get_plugin_conf_value('alarm|percent', -0.1)
+        if n <= 0 or m <= 0 or conf_percent < 0:
             return
 
         # CPU 占用率
@@ -31,7 +31,7 @@ class Cpu(AggsPlugin):
             return
 
         data = self.n_minute_data[-n:]
-        new_data = list(filter(lambda x: x >= percent, data))
+        alarm_data = list(filter(lambda x: x >= conf_percent, data))
 
         # n 分钟内有 m 次 cpu 占用率达到 percent% 报警
-        len(new_data) >= m and self.put_alarm_metric(f'CPU 占用率过高(%): >={percent}')
+        len(alarm_data) >= m and self.put_alarm_metric(f'CPU 占用率过高(%): {max(alarm_data)}>={conf_percent}')

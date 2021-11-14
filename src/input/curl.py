@@ -83,7 +83,7 @@ class Curl(InputPlugin):
                 if self.conf.debug and not resp.ok:
                     logger.warning(f'curl {resp.status}, req_info={resp.request_info}, metric={metric.as_text}')
         except Exception as e:
-            self.conf.debug and logger.opt(exception=True).error(f'curl exception, req={req} err={e}')
+            self.conf.debug and logger.error(f'curl exception, req={req} err={e}')
 
         return metric
 

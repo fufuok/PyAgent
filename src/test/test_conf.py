@@ -17,7 +17,7 @@ open:
 
 # 采集时间间隔(公共的)
 interval: 1000'''
-    res = Config.get_yaml(txt_conf)
+    res = Config.load_yaml(txt_conf)
     assert isinstance(res, dict)
     assert len(res) == 2
     assert isinstance(res.get('open'), list)

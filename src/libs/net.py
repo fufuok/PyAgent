@@ -35,7 +35,7 @@ async def request(
                 res = await resp.text()
                 return get_json_loads(res) if as_json else (res, resp.status, dict(resp.headers))
         except Exception as e:
-            logger.opt(exception=True).debug('Exception: {}, {}: {}', e, method, url)
+            logger.debug('Exception: {}, {}: {}', e, method, url)
             if throw:
                 raise e
             return {} if as_json else ('', 504, {})
