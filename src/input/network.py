@@ -8,7 +8,6 @@
     :update: Fufu, 2021/11/8 代码重构, 支持网卡前缀配置和多 IP
 """
 import time
-from asyncio import create_task, get_running_loop, sleep
 
 import psutil
 
@@ -27,15 +26,9 @@ class Network(InputPlugin):
     # 存储上一时间的网卡数据
     last_data = {}
 
-    async def run(self):
-        """定时执行收集"""
-        while True:
-            create_task(self.gather())
-            await sleep(self.get_interval(60))
-
     async def gather(self):
         """获取数据"""
-        return await get_running_loop().run_in_executor(None, self.get_network_info)
+        return await self.to_thread(self.get_network_info)
 
     def get_network_info(self):
         """获取网络信息"""

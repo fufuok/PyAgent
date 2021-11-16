@@ -6,9 +6,9 @@
 
     :author: Fufu, 2021/6/7
 """
-from abc import abstractmethod
-from asyncio import Queue
-from typing import Any, Optional
+from typing import Any
+
+from loguru import logger
 
 from ..libs.metric import Metric
 from ..libs.plugin import BasePlugin
@@ -19,18 +19,14 @@ class OutputPlugin(BasePlugin):
 
     module = 'output'
 
-    def __init__(self, conf, in_queue: Queue, out_queue: Optional[Queue]) -> None:
-        super().__init__(conf)
-
-        # 数据队列
-        self.in_queue = in_queue
-        self.out_queue = out_queue
-
     async def run(self) -> None:
         """数据打包并提交发布"""
-        while True:
+        logger.debug(f'{self.module}.{self.name}({self.alias}) is working')
+        is_closed = False
+        while not is_closed:
             # 取队列数据
             metric = await self.in_queue.get()
+            is_closed = metric.is_closed
 
             # 数据传递
             self.out_queue and self.out_queue.put_nowait(metric)
@@ -38,7 +34,8 @@ class OutputPlugin(BasePlugin):
             await self.write(metric)
             self.in_queue.task_done()
 
-    @abstractmethod
+        logger.debug(f'{self.module}.{self.name}({self.alias}) is closed')
+
     async def write(self, metric: Metric) -> Any:
         """写入数据"""
         pass

@@ -6,7 +6,7 @@
 
     :author: Fufu, 2021/6/15
 """
-from asyncio import as_completed, create_task, ensure_future, sleep
+from asyncio import as_completed, ensure_future
 from typing import Any
 
 from aiohttp import ClientSession, TCPConnector
@@ -22,12 +22,6 @@ class Curl(InputPlugin):
 
     # 模块名称
     name = 'curl'
-
-    async def run(self) -> None:
-        """定时执行收集"""
-        while True:
-            create_task(self.gather())
-            await sleep(self.get_interval(60))
 
     async def gather(self) -> None:
         """按配置发起请求任务"""

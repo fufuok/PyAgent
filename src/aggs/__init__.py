@@ -6,8 +6,7 @@
 
     :author: Fufu, 2021/6/7
 """
-from abc import abstractmethod
-from asyncio import Queue, create_task
+from asyncio import create_task
 from typing import Any
 
 from loguru import logger
@@ -21,18 +20,14 @@ class AggsPlugin(BasePlugin):
 
     module = 'aggs'
 
-    def __init__(self, conf, in_queue: Queue, out_queue: Queue) -> None:
-        super().__init__(conf)
-
-        # 数据队列
-        self.in_queue = in_queue
-        self.out_queue = out_queue
-
     async def run(self) -> None:
         """数据汇聚/报警"""
-        while True:
+        logger.debug(f'{self.module}.{self.name}({self.alias}) is working')
+        is_closed = False
+        while not is_closed:
             # 取队列数据
             metric = await self.in_queue.get()
+            is_closed = metric.is_closed
 
             # 数据分发
             create_task(self.alarm(metric))
@@ -41,7 +36,8 @@ class AggsPlugin(BasePlugin):
             self.out_queue.put_nowait(metric)
             self.in_queue.task_done()
 
-    @abstractmethod
+        logger.debug(f'{self.module}.{self.name}({self.alias}) is closed')
+
     async def alarm(self, metric: Metric) -> Any:
         """报警器"""
         pass

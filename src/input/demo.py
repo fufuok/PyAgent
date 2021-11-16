@@ -6,7 +6,6 @@
 
     :author: Fufu, 2021/6/7
 """
-from asyncio import create_task, sleep
 from random import randint
 
 from . import InputPlugin
@@ -17,12 +16,6 @@ class Demo(InputPlugin):
 
     # 模块名称
     name = 'demo'
-
-    async def run(self) -> None:
-        """定时执行收集"""
-        while True:
-            create_task(self.gather())
-            await sleep(self.get_interval(60))
 
     async def gather(self) -> None:
         """获取数据"""

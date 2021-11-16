@@ -4,7 +4,7 @@
 
 基于 asyncio 的高性能/插件式 Python Agent, 跨平台的运维监控和指标采集框架. 兼容 Windows/Linux, 灵感来自于: `Telegraf`
 
-- 配置远程管理, 自动拉取更新, 动态加载
+- 配置远程管理, 自动拉取更新, 动态加载插件和配置
 - 插件式, 易扩展, 插件自动扫描/静态注册(默认)
 - 轻量协程, 资源占用低, 若有阻塞类代码请放入线程执行
 - 脚手架, 请根据业务需要编写插件即可
@@ -19,7 +19,7 @@
 若要使用自动拉取配置, 请参考 `src/conf/config.py` 中的 `update()` 方法接入自己的配置中心接口.
 
 配置文档采用 YAML 格式, 系统有 3 重可选配置, 优先级为:
-``
+
 ```
 各插件本地目录(input/processor/aggs/output)
   > host.yaml(适配在线管理的基于主机 IP 的配置)
@@ -38,26 +38,37 @@ python3 main.py
 
 ```shell
 root@DevBeta:~/py/pyagent# python3 main.py 
-2021-11-08 16:58:55.535 | DEBUG | src.conf.config.init_logger:218 | 日志初始化完成
-2021-11-08 16:58:55.536 | INFO | src.app.main:67 | PyAgent(v0.0.1) start working...
->>> METRIC, name=disk time=2021-11-08T16:58:55+08:00 timestamp=1636361935 node_ip=0.0.0.1 host=Host001 device=/dev/sda2 mountpoint=/ fstype=ext4 opts=rw,relatime maxfile=255 maxpath=4096 total=42004086784 used=22700482560 free=17139503104 percent=57.0 human_total=39.1 GB human_used=21.1 GB human_free=16.0 GB
->>> METRIC, name=mem time=2021-11-08T16:58:55+08:00 timestamp=1636361935 node_ip=0.0.0.1 host=Host001 total=8348397568 available=5583859712 percent=33.1 used=2405683200 free=755449856 active=3767451648 inactive=3022487552 buffers=662564864 cached=4524699648 shared=46055424 slab=650911744 human_total=7.8 GB human_available=5.2 GB human_used=2.2 GB human_free=720.5 MB human_active=3.5 GB human_inactive=2.8 GB human_buffers=631.9 MB human_cached=4.2 GB human_shared=43.9 MB human_slab=620.8 MB
->>> METRIC, name=telnet time=2021-11-08T16:58:55+08:00 timestamp=1636361935 node_ip=0.0.0.1 host=Host001 tag=迅游网站 HTTPS 测试 address=xunyou.com:443 as_ipv6=False timeout=5 yes=True n=0
->>> METRIC, name=telnet time=2021-11-08T16:58:55+08:00 timestamp=1636361935 node_ip=0.0.0.1 host=Host001 tag=百度80端口(IPv4) address=baidu.com:80 as_ipv6=False timeout=6 yes=True n=0
->>> METRIC, name=cpu time=2021-11-08T16:58:55+08:00 timestamp=1636361935 node_ip=0.0.0.1 host=Host001 cpu_logical_count=4 cpu_count=4 cpu_percent=2.5 cpu_times={'user': 1741209.93, 'nice': 4052.77, 'system': 422872.23, 'idle': 60109483.72, 'iowait': 3555.77, 'irq': 0.0, 'softirq': 95267.22, 'steal': 0.0, 'guest': 0.0, 'guest_nice': 0.0} cpu_stats={'ctx_switches': 16577901662, 'interrupts': 13940036467, 'soft_interrupts': 17687347457, 'syscalls': 0} cpu_freq={'current': 3300.0, 'min': 0.0, 'max': 0.0}
->>> METRIC, name=ping time=2021-11-08T16:58:59+08:00 timestamp=1636361939 node_ip=0.0.0.1 host=Host001 loss=0.0 minimum=35.373 maximum=41.993 average=37.653 tag=114DNS address=114.114.114.114
->>> METRIC, name=ping time=2021-11-08T16:58:59+08:00 timestamp=1636361939 node_ip=0.0.0.1 host=Host001 loss=0.0 minimum=31.529 maximum=74.759 average=41.084 tag=阿里IPv6DNS address=2400:3200::1
->>> METRIC, name=ping time=2021-11-08T16:59:04+08:00 timestamp=1636361944 node_ip=0.0.0.1 host=Host001 loss=0.0 minimum=195.219 maximum=308.121 average=204.975 tag=荷兰弗莱福兰 address=91.243.80.33
->>> METRIC, name=ping time=2021-11-08T16:59:07+08:00 timestamp=1636361947 node_ip=0.0.0.1 host=Host001 loss=3.0 minimum=278.272 maximum=370.513 average=283.397 tag=乌克兰苏梅 address=95.47.163.1
->>> METRIC, name=ping time=2021-11-08T16:59:08+08:00 timestamp=1636361948 node_ip=0.0.0.1 host=Host001 loss=43.0 minimum=35.35 maximum=47.399 average=42.876 tag=谷歌DNS address=8.8.8.8
-2021-11-08 16:59:19.546 | DEBUG | src.aggs.put_alarm_metric:67 | alarm_metric: {"name": "ping", "time": "2021-11-08T16:59:19+08:00", "timestamp": 1636361959, "node_ip": "0.0.0.1", "host": "Host001", "code": "monitor_metric_alarm", "info": "\u6d4b\u8bd5\u7f51\u7edc\u4e0d\u901a \u4e22\u5305\u6bd4\u4f8b\u8fc7\u9ad8(%): 100>=100.0", "more": "123.0.0.45"}
->>> METRIC, name=ping time=2021-11-08T16:59:19+08:00 timestamp=1636361959 node_ip=0.0.0.1 host=Host001 loss=100 minimum=5000 maximum=5000 average=5000 tag=测试网络不通 address=123.0.0.45
->>> ALARM, name=ping time=2021-11-08T16:59:19+08:00 timestamp=1636361959 node_ip=0.0.0.1 host=Host001 code=monitor_metric_alarm info=测试网络不通 丢包比例过高(%): 100>=100.0 more=123.0.0.45
+2021-11-15 10:20:39.680 | DEBUG | src.conf.config.init_logger:288 | 日志初始化完成
+2021-11-15 10:20:39.681 | INFO | src.app.main:71 | PyAgent(v0.1.0) start working
+2021-11-15 10:20:39.695 | INFO | src.app.start_plugins:93 | Plugin cpu start working
+2021-11-15 10:20:39.696 | INFO | src.app.start_plugins:93 | Plugin mem start working
+2021-11-15 10:20:39.697 | INFO | src.app.start_plugins:93 | Plugin disk start working
+2021-11-15 10:20:39.699 | DEBUG | src.input.run:25 | input.cpu is working
+2021-11-15 10:20:39.699 | DEBUG | src.processor.run:25 | processor.default(cpu) is working
+2021-11-15 10:20:39.700 | DEBUG | src.aggs.run:26 | aggs.cpu(cpu) is working
+2021-11-15 10:20:39.701 | DEBUG | src.output.run:25 | output.console(cpu) is working
+2021-11-15 10:20:39.701 | DEBUG | src.output.es.run:30 | output.es(cpu) is working
+2021-11-15 10:20:39.702 | DEBUG | src.output.default.run:21 | output.default(cpu) is working
+2021-11-15 10:20:39.702 | DEBUG | src.input.run:25 | input.mem is working
+2021-11-15 10:20:39.702 | DEBUG | src.processor.run:25 | processor.default(mem) is working
+2021-11-15 10:20:39.703 | DEBUG | src.aggs.run:26 | aggs.mem(mem) is working
+2021-11-15 10:20:39.703 | DEBUG | src.output.run:25 | output.console(mem) is working
+2021-11-15 10:20:39.703 | DEBUG | src.output.es.run:30 | output.es(mem) is working
+2021-11-15 10:20:39.704 | DEBUG | src.output.default.run:21 | output.default(mem) is working
+2021-11-15 10:20:39.704 | DEBUG | src.input.run:25 | input.disk is working
+2021-11-15 10:20:39.704 | DEBUG | src.processor.run:25 | processor.default(disk) is working
+2021-11-15 10:20:39.705 | DEBUG | src.aggs.run:26 | aggs.disk(disk) is working
+2021-11-15 10:20:39.705 | DEBUG | src.output.run:25 | output.console(disk) is working
+2021-11-15 10:20:39.705 | DEBUG | src.output.es.run:30 | output.es(disk) is working
+2021-11-15 10:20:39.706 | DEBUG | src.output.default.run:21 | output.default(disk) is working
+>>> METRIC, name=mem time=2021-11-15T10:20:39+08:00 timestamp=1636942839 node_ip=0.0.0.0 host=WebServer total=8348397568 available=5567897600 percent=33.3 used=2422042624 free=433340416 active=3699130368 inactive=3444563968 buffers=349544448 cached=5143470080 shared=46780416 slab=621330432 human_total=7.8 GB human_available=5.2 GB human_used=2.3 GB human_free=413.3 MB human_active=3.4 GB human_inactive=3.2 GB human_buffers=333.4 MB human_cached=4.8 GB human_shared=44.6 MB human_slab=592.5 MB
+>>> METRIC, name=disk time=2021-11-15T10:20:39+08:00 timestamp=1636942839 node_ip=0.0.0.0 host=WebServer device=/dev/sda2 mountpoint=/ fstype=ext4 opts=rw,relatime maxfile=255 maxpath=4096 total=42004086784 used=22808981504 free=17031004160 percent=57.3 human_total=39.1 GB human_used=21.2 GB human_free=15.9 GB
+>>> METRIC, name=cpu time=2021-11-15T10:20:39+08:00 timestamp=1636942839 node_ip=0.0.0.0 host=WebServer cpu_logical_count=4 cpu_count=4 cpu_percent=2.4 cpu_times={'user': 1803486.75, 'nice': 4242.65, 'system': 437369.76, 'idle': 62342010.14, 'iowait': 3763.82, 'irq': 0.0, 'softirq': 97654.76, 'steal': 0.0, 'guest': 0.0, 'guest_nice': 0.0} cpu_stats={'ctx_switches': 17157214700, 'interrupts': 14394108423, 'soft_interrupts': 18238331768, 'syscalls': 0} cpu_freq={'current': 3300.0, 'min': 0.0, 'max': 0.0}
 ```
 
 或用 `pyinstaller` 打包后运行, 配置文件目录 `etc` 与 `main.exe` 放在同一目录.
 
-(注: 若要打包请看: `src/conf/config.py` 第 65 行注释, 如果要在 Windows 7 或 2008 上运行, 最好使用 Python-3.8)
+(注: 若要打包请看: `src/conf/config.py` 中 `self.plugins = PLUGINS` 处的注释, 如果要在 Windows 7 或 2008 上运行, 最好使用 Python-3.8)
 
 `dist` 是单配置文件示例, 解压后运行 `main.exe` 即可.
 

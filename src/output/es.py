@@ -27,9 +27,11 @@ class Es(OutputPlugin):
 
     async def run(self) -> None:
         """数据打包并提交发布"""
-        while True:
+        logger.debug(f'{self.module}.{self.name}({self.alias}) is working')
+        is_closed = False
+        while not is_closed:
             # 定时推送
-            await asyncio.sleep(self.get_interval(default=30))
+            await asyncio.sleep(self.get_interval(30))
 
             # 取队列数据
             metrics = []
@@ -42,6 +44,8 @@ class Es(OutputPlugin):
 
             # 执行推送
             metrics and asyncio.create_task(self.write(metrics))
+
+        logger.debug(f'{self.module}.{self.name}({self.alias}) is closed')
 
     async def write(self, metrics: List[Metric]) -> None:
         """写入数据"""

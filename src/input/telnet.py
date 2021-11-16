@@ -6,7 +6,7 @@
 
     :author: Fufu, 2021/6/16
 """
-from asyncio import create_task, get_running_loop, sleep
+from asyncio import create_task
 from typing import Union
 
 from . import InputPlugin
@@ -19,12 +19,6 @@ class Telnet(InputPlugin):
 
     # 模块名称
     name = 'telnet'
-
-    async def run(self) -> None:
-        """定时执行收集"""
-        while True:
-            create_task(self.gather())
-            await sleep(self.get_interval(60))
 
     async def gather(self) -> None:
         """获取数据"""
@@ -43,7 +37,7 @@ class Telnet(InputPlugin):
             timeout: int = 5,
     ) -> None:
         """执行检测并发送结果"""
-        yes, n = await get_running_loop().run_in_executor(None, chk_port, address, None, as_ipv6, timeout)
+        yes, n = await self.to_thread(chk_port, address, None, as_ipv6, timeout)
         metric = self.metric({
             'tag': tag,
             'address': address,

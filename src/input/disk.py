@@ -6,8 +6,6 @@
 
     :author: kerrygao, Fufu, 2021/6/10
 """
-from asyncio import create_task, get_running_loop, sleep
-
 import psutil
 
 from . import InputPlugin
@@ -21,15 +19,9 @@ class Disk(InputPlugin):
     # 模块名称
     name = 'disk'
 
-    async def run(self):
-        """定时执行收集"""
-        while True:
-            create_task(self.gather())
-            await sleep(self.get_interval(60))
-
     async def gather(self):
         """磁盘占用情况"""
-        return await get_running_loop().run_in_executor(None, self.get_disk_info)
+        return await self.to_thread(self.get_disk_info)
 
     def get_disk_info(self):
         """磁盘占用情况"""

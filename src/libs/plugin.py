@@ -6,20 +6,30 @@
 
     :author: Fufu, 2021/6/9
 """
+import functools
 import json
 from abc import ABC, abstractmethod
+from asyncio import Queue, events
+from contextvars import copy_context
 from typing import Any, List, Optional, Tuple, Union
 
 from .metric import Metric
 
 
-class BasePlugin(ABC):
+class RootPlugin(ABC):
     """插件基类"""
 
+    # 模块名称, 如: input, aggs, processor, output
     module = ''
+
+    # 插件名称, 如: cpu, console, default
     name = ''
 
+    # 别名, 指当前实例代表哪个插件
+    alias = ''
+
     def __init__(self, conf: Any) -> None:
+        # 插件配置
         self.conf = conf
 
     @abstractmethod
@@ -132,3 +142,33 @@ class BasePlugin(ABC):
     def metrics_as_json(metrics: List[Metric]) -> str:
         """指标数据列表转为 JSON"""
         return json.dumps(BasePlugin.metrics_as_dict(metrics)) if metrics else ''
+
+    @staticmethod
+    async def to_thread(func, /, *args, **kwargs):
+        """
+        来自于 python3.9+ asyncio.to_thread, 在协程中异步执行阻塞事件
+
+        Asynchronously run function *func* in a separate thread.
+
+        Any *args and **kwargs supplied for this function are directly passed
+        to *func*. Also, the current :class:`contextvars.Context` is propagated,
+        allowing context variables from the main thread to be accessed in the
+        separate thread.
+
+        Return a coroutine that can be awaited to get the eventual result of *func*.
+        """
+        loop = events.get_running_loop()
+        ctx = copy_context()
+        func_call = functools.partial(ctx.run, func, *args, **kwargs)
+        return await loop.run_in_executor(None, func_call)
+
+
+class BasePlugin(RootPlugin, ABC):
+    """插件基类(队列)"""
+
+    def __init__(self, conf: Any, in_queue: Optional[Queue], out_queue: Optional[Queue]) -> None:
+        super().__init__(conf)
+
+        # 数据队列
+        self.in_queue = in_queue
+        self.out_queue = out_queue

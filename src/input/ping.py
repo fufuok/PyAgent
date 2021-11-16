@@ -6,11 +6,11 @@
 
     :author: kerrygao, Fufu, 2021/6/21
 """
-from asyncio import create_task, sleep
+from asyncio import create_task
 
 from . import InputPlugin
-from ..libs.net import pyping
 from ..libs.helper import get_dict_value
+from ..libs.net import pyping
 
 
 class Ping(InputPlugin):
@@ -18,12 +18,6 @@ class Ping(InputPlugin):
 
     # 模块名称
     name = 'ping'
-
-    async def run(self) -> None:
-        """定时执行收集"""
-        while True:
-            create_task(self.gather())
-            await sleep(self.get_interval(60))
 
     async def gather(self) -> None:
         """获取数据"""

@@ -42,6 +42,11 @@ class Config:
     # 插件集
     plugins = {}
 
+    # 工作中, 公共的, 开启的插件名称
+    plugins_working = set()
+    plugins_common = set()
+    plugins_open = set()
+
     # 模块
     modules = ['input', 'processor', 'aggs', 'output', 'common']
 
@@ -117,11 +122,15 @@ class Config:
         self.debug = self.get_conf_value('main|debug', False)
         self.info = self.get_conf_value('main|info', {})
         self.reload_sec = max(self.get_conf_value('main|reload_sec', 300), 10)
+        self.plugins_open = get_dict_value(self.main, 'open', set())
 
         for module in self.modules:
             conf = {'default': {}}
-            # 开启的插件 + 主配置中可能的公共插件
-            plugins = set(self.main.get('open', []) + self.main.get(f'common_{module}', []))
+            # 主配置中的公共插件
+            plugins_common = get_dict_value(self.main, f'common_{module}', set())
+            self.plugins_common.update(plugins_common)
+            # 开启的插件 + 公共插件
+            plugins = plugins_common | self.plugins_open
             for name in plugins:
                 # 初始化插件配置
                 conf.update({name: {}})

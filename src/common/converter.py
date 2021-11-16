@@ -12,10 +12,10 @@ from inspect import isfunction
 from ..libs.converter import *
 from ..libs.helper import get_dict_value, get_fn_value
 from ..libs.metric import Metric
-from ..libs.plugin import BasePlugin
+from ..libs.plugin import RootPlugin
 
 
-class Converter(BasePlugin):
+class Converter(RootPlugin):
     """类型转换处理"""
 
     # 转换函数集

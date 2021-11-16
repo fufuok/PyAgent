@@ -6,8 +6,6 @@
 
     :author: kerrygao, Fufu, 2021/6/10
 """
-from asyncio import create_task, get_running_loop, sleep
-
 import psutil
 
 from . import InputPlugin
@@ -20,15 +18,9 @@ class Cpu(InputPlugin):
     # 模块名称
     name = 'cpu'
 
-    async def run(self):
-        """定时执行收集"""
-        while True:
-            create_task(self.gather())
-            await sleep(self.get_interval(60))
-
     async def gather(self):
         """获取数据"""
-        metric = await get_running_loop().run_in_executor(None, self.get_cpu_info)
+        metric = await self.to_thread(self.get_cpu_info)
         self.out_queue.put_nowait(metric)
 
     def get_cpu_info(self):

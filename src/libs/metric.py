@@ -107,5 +107,10 @@ class Metric:
         """转换为字符串"""
         return '{}, {}'.format(self.tag.upper(), ' '.join([f'{k}={v}' for k, v in self.metric.items()]))
 
+    @property
+    def is_closed(self) -> bool:
+        """检查是否为关闭信号(退出插件)"""
+        return self.tag == '__CLOSE_SIGNAL__'
+
     def __contains__(self, key: str):
         return key in self.metric
