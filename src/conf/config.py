@@ -60,6 +60,10 @@ class Config:
         self.src_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
         # 配置文件目录
         self.etc_dir = os.path.join(self.root_dir, 'etc')
+        # 默认主配置文件路径
+        self.main_yaml = os.path.join(self.etc_dir, 'main.yaml')
+        # 主机专属主配置文件路径
+        self.host_yaml = os.path.join(self.etc_dir, 'host.yaml')
 
         # 初始化配置
         self.reload()
@@ -98,9 +102,9 @@ class Config:
             return
 
         # 更新默认主配置文件
-        self.dump_yaml_file(main_conf, os.path.join(self.etc_dir, 'main.yaml'))
+        self.dump_yaml_file(main_conf, self.main_yaml)
         # 更新主机配置文件
-        self.dump_yaml_file(host_conf, os.path.join(self.etc_dir, 'host.yaml'))
+        self.dump_yaml_file(host_conf, self.host_yaml)
 
     def reload(self) -> None:
         """
@@ -108,13 +112,13 @@ class Config:
         配置优先级: 各插件目录(input/processor/aggs/output) > host.yaml > main.yaml
         """
         # 加载主配置
-        main = self.load_yaml_file(os.path.join(self.etc_dir, 'main.yaml'))
+        main = self.load_yaml_file(self.main_yaml)
         if not main or get_dict_value(main, 'interval', 0) <= 0:
             logger.warning('配置加载失败, 默认主配置有误')
             return
 
         # 加载主机个性化主配置
-        host = self.load_yaml_file(os.path.join(self.etc_dir, 'host.yaml'))
+        host = self.load_yaml_file(self.host_yaml)
 
         # 扩展合并主配置
         self.main = extend_dict(main, host)
