@@ -70,7 +70,7 @@ root@DevBeta:~/py/pyagent# python3 main.py
 
 (注: 若要打包请看: `src/conf/config.py` 中 `self.plugins = PLUGINS` 处的注释, 如果要在 Windows 7 或 2008 上运行, 最好使用 Python-3.8)
 
-`dist` 是单配置文件示例, 解压后运行 `main.exe` 即可.
+`dist` 是单配置文件示例.
 
 打包命令参考:
 

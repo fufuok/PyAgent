@@ -6,3 +6,10 @@
 2021-11-15 15:25:52 | INFO | src.app.start_plugins:93 | Plugin network start working
 2021-11-15 15:25:52 | INFO | src.app.start_plugins:93 | Plugin mem start working
 2021-11-15 15:25:52 | INFO | src.app.start_plugins:93 | Plugin telnet start working
+2021-11-22 09:27:40 | INFO | src.app.main:71 | PyAgent(v0.1.1) start working
+2021-11-22 09:27:40 | INFO | src.app.start_plugins:93 | Plugin disk start working
+2021-11-22 09:27:40 | INFO | src.app.start_plugins:93 | Plugin ping start working
+2021-11-22 09:27:40 | INFO | src.app.start_plugins:93 | Plugin telnet start working
+2021-11-22 09:27:40 | INFO | src.app.start_plugins:93 | Plugin cpu start working
+2021-11-22 09:27:40 | INFO | src.app.start_plugins:93 | Plugin mem start working
+2021-11-22 09:27:40 | INFO | src.app.start_plugins:93 | Plugin network start working
