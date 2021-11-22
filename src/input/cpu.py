@@ -9,6 +9,7 @@
 import psutil
 
 from . import InputPlugin
+from ..libs.helper import get_round
 from ..libs.psutil import to_dict
 
 
@@ -26,25 +27,40 @@ class Cpu(InputPlugin):
     def get_cpu_info(self):
         """获取 CPU 信息"""
         # CPU 逻辑个数
-        cpu_logical_count = psutil.cpu_count()
+        logical_count = psutil.cpu_count()
         # CPU 物理个数
-        cpu_count = psutil.cpu_count(logical=False)
-        # CPU 占用率
-        cpu_percent = psutil.cpu_percent(interval=0.1)
+        count = psutil.cpu_count(logical=False)
+        # CPU 总使用率
+        percent = psutil.cpu_percent(interval=None)
+        # CPU 单核使用率
+        percent_percpu = psutil.cpu_percent(interval=None, percpu=True)
+        max_percent = max(percent_percpu) if percent_percpu else percent
         # CPU 运行时间
-        cpu_times = psutil.cpu_times()
+        times = psutil.cpu_times()
+        # CPU 运行时间比例
+        times_percent = psutil.cpu_times_percent()
         # CPU 统计信息
-        cpu_stats = psutil.cpu_stats()
-        # CPU 频率
-        cpu_freq = psutil.cpu_freq()
+        stats = psutil.cpu_stats()
+        # 1, 5, 15 分钟系统平均负载
+        try:
+            loadavg = psutil.getloadavg()
+        except Exception:
+            loadavg = [0]
+        loadavg_precent = [get_round(x / logical_count * 100) for x in loadavg]
+        loadavg_precent_1 = loadavg_precent[0]
 
         metric = self.metric({
-            'cpu_logical_count': cpu_logical_count,
-            'cpu_count': cpu_count,
-            'cpu_percent': cpu_percent,
-            'cpu_times': to_dict(cpu_times),
-            'cpu_stats': to_dict(cpu_stats),
-            'cpu_freq': to_dict(cpu_freq)
+            'logical_count': logical_count,
+            'count': count,
+            'percent': percent,
+            'percent_percpu': percent_percpu,
+            'max_percent': max_percent,
+            'times': to_dict(times),
+            'times_percent': to_dict(times_percent),
+            'stats': to_dict(stats),
+            'loadavg': loadavg,
+            'loadavg_precent': loadavg_precent,
+            'loadavg_precent_1': loadavg_precent_1,
         })
 
         return metric

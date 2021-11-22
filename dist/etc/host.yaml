@@ -3,12 +3,6 @@ aggs:
     alarm:
       loadavg_precent_1: 20.1
       percent: 23
-  disk:
-    alarm:
-      percent: 23
-  mem:
-    alarm:
-      percent: 23
 info:
   host: LOCAL-TEST
   node_ip: 127.0.0.1
