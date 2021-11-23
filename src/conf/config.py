@@ -111,16 +111,22 @@ class Config:
         重新加载所有配置
         配置优先级: 各插件目录(input/processor/aggs/output) > host.yaml > main.yaml
         """
-        # 加载主配置
+        # 加载默认主配置: etc/main.yaml
         main = self.load_yaml_file(self.main_yaml)
         if not main or get_dict_value(main, 'interval', 0) <= 0:
             logger.warning('配置加载失败, 默认主配置有误')
             return
 
-        # 加载主机个性化主配置
+        # 合并本地主配置: etc/main/main.yaml 优先于 etc/main.yaml
+        main = extend_dict(main, self.get_conf('main', 'main'))
+
+        # 加载主机个性化主配置: etc/host.yaml
         host = self.load_yaml_file(self.host_yaml)
 
-        # 扩展合并主配置
+        # 合并本地主机个性化配置: etc/main/host.yaml 优先于 etc/host.yaml
+        host = extend_dict(host, self.get_conf('main', 'host'))
+
+        # 扩展合并主配置: host.yaml 优先于 main.yaml
         self.main = extend_dict(main, host)
 
         self.debug = self.get_conf_value('main|debug', False)

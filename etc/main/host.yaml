@@ -1,0 +1,6 @@
+aggs:
+  mem:
+    alarm:
+      percent: 21.001
+info:
+  host: LOCAL-TEST-1
