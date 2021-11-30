@@ -36,10 +36,12 @@ class Curl(InputPlugin):
                     continue
 
                 # 请求参数集
+                headers = get_dict_value(conf, 'headers', {})
                 method = get_dict_value(conf, 'method', 'get').upper()
                 req = {
                     'url': url,
                     'method': method,
+                    'headers': headers,
                 }
 
                 if method == 'POST':
@@ -64,7 +66,7 @@ class Curl(InputPlugin):
             'method': req['method'],
             'response': '',
             'status': 504,
-            'header': {},
+            'headers': {},
         })
         try:
             async with sess.request(**req) as resp:
@@ -72,7 +74,7 @@ class Curl(InputPlugin):
                 metric.set(**{
                     'response': res,
                     'status': resp.status,
-                    'header': dict(resp.headers),
+                    'headers': dict(resp.headers),
                 })
                 if self.conf.debug and not resp.ok:
                     logger.warning(f'curl {resp.status}, req_info={resp.request_info}, metric={metric.as_text}')

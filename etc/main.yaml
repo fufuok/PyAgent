@@ -20,7 +20,7 @@ open:
   - cpu
   - disk
   - network
-  # - curl
+  - curl
   - telnet
   - ping
 

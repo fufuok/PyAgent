@@ -78,15 +78,15 @@ class Curl(AggsPlugin):
         return True, ''
 
     @staticmethod
-    def chk_header(metric: Metric, conf: dict) -> Tuple[bool, str]:
+    def chk_headers(metric: Metric, conf: dict) -> Tuple[bool, str]:
         """检查响应头是否包含相应键值"""
-        header = metric.get('header')
-        if not header or not isinstance(header, dict):
+        headers = metric.get('headers')
+        if not headers or not isinstance(headers, dict):
             return False, '响应头为空或不正确'
 
         if conf and isinstance(conf, dict):
             for k, v in conf.items():
-                if str(header.get(k)) != str(v):
+                if str(headers.get(k)) != str(v):
                     return False, f'响应头: {k} != {v}'
 
         return True, ''

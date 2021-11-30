@@ -16,3 +16,9 @@ target:
     data:
       code: curl_post
       a: 32
+  指定IP请求示例:
+    # 请求 URL 为域名指定的解析结果, 类似 curl --resolve
+    url: https://79.98.145.42:443/short
+    # 指定请求主机名, 不区分大小写
+    headers:
+      Host: ip.42.pl

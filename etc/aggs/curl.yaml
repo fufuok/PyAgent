@@ -21,7 +21,7 @@ alarm:
     #  ok: 1
 
     # 5. 响应头包含键值对
-    #header:
+    #headers:
     #  Server: nginx
 
   # 指定标识报警, 规则设置方法与上面一致, 仅生效于对应的标记
@@ -34,5 +34,5 @@ alarm:
       json:
         ok: 1
       # 响应头包含
-      header:
+      headers:
         Server: DataRouter
