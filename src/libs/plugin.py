@@ -133,6 +133,22 @@ class RootPlugin(ABC):
         """生成 Metric 数据对象, 附带服务器标识信息"""
         return Metric(self.name, data, tag=tag, info=info if isinstance(info, dict) else self.conf.info)
 
+    async def use_common_plugin(self, metric: Metric, key_path: str = '') -> Metric:
+        """根据配置调用同模块插件"""
+        for key, plugin_conf in self.get_plugin_conf_value(key_path, {}).items():
+            if key.startswith('use_plugin_'):
+                plugin_name = key.split('use_plugin_', 1)[1]
+                if not plugin_name:
+                    continue
+
+                plugin_cls = self.conf.get_plugin_obj('common', plugin_name)
+                if not plugin_cls:
+                    continue
+
+                metric = await plugin_cls(self.conf, self.module, self.name, metric, plugin_conf).run()
+
+        return metric
+
     @staticmethod
     def metrics_as_dict(metrics: List[Metric]) -> List[dict]:
         """指标数据列表转为字典"""
