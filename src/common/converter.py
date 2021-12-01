@@ -9,13 +9,13 @@
 import re
 from inspect import isfunction
 
+from . import Common
 from ..libs.converter import *
 from ..libs.helper import get_dict_value, get_fn_value
 from ..libs.metric import Metric
-from ..libs.plugin import RootPlugin
 
 
-class Converter(RootPlugin):
+class Converter(Common):
     """类型转换处理"""
 
     # 转换函数集
@@ -27,13 +27,9 @@ class Converter(RootPlugin):
             module: str,
             name: str,
             metric: Metric,
+            plugin_conf: Optional[dict] = None,
     ) -> None:
-        super().__init__(conf)
-
-        # 调用时传入数据, 模块和名称
-        self.metric = metric
-        self.module = module
-        self.name = name
+        super().__init__(conf, module, name, metric, plugin_conf)
 
         if not self.fn:
             for x, obj in globals().items():
@@ -42,8 +38,7 @@ class Converter(RootPlugin):
 
     async def run(self) -> Metric:
         """转换数据并增加到新字段"""
-        # 加载调用公共插件的固定名称对应配置
-        for fn_name, fn_conf in self.get_plugin_conf_value('use_plugin_converter', {}).items():
+        for fn_name, fn_conf in self.plugin_conf.items():
             fn = self.fn.get(fn_name)
             if not fn or not fn_conf or not isinstance(fn_conf, dict):
                 continue

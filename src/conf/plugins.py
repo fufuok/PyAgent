@@ -6,7 +6,7 @@
 
     :author: Fufu, 2021/6/13
 """
-from ..common import converter
+from ..common import converter, discard
 from ..input import (demo as input_demo, cpu as input_cpu, mem as input_mem, disk as input_disk,
                      network as input_network, curl as input_curl, telnet as input_telnet, ping as input_ping)
 from ..processor import default as processor_default, demo as processor_demo
@@ -18,6 +18,7 @@ from ..output import default as output_default, console as output_console, es as
 PLUGINS = {
     'common': {
         'converter': converter.Converter,
+        'discard': discard.Discard,
     },
     'input': {
         'demo': input_demo.Demo,
