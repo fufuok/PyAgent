@@ -21,7 +21,7 @@ open:
   - cpu
   - disk
   - network
-  # - curl
+  - curl
   - telnet
   - ping
 
@@ -67,6 +67,14 @@ input:
       # 标记(唯一), 与报警配置的标记相同, 同时会在报警消息显示
       迅游网站 HTTPS 测试:
         address: xunyou.com:443
+  curl:
+    target:
+      # 请求的标记, 唯一, 与报警设置的标记对应
+      百度(GET):
+        # 请求的 URL
+        url: http://baidu.com
+        # 默认为 get 请求
+        method: get
 
 # 数据处理插件默认配置
 processor:
@@ -126,6 +134,26 @@ aggs:
     alarm:
       # 所有 telnet 目标不通都报警
       all: true
+  curl:
+    alarm:
+      all:
+        # 1. 状态码检查, 如: 200 或 301 则正常
+        status:
+          - 200
+          - 301
+          - 302
+      target:
+        百度(GET):
+          # 返回值包含
+          contains: baidu.com
+    # 报警后数据处理
+    after:
+      # 丢弃数据字段
+      use_plugin_discard:
+        # 数据标识 tag 字段名称, all 表示所有标识
+        all:
+          - headers
+          - response
 
 # 输出插件默认配置
 output:

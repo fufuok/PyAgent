@@ -61,7 +61,7 @@ class Metric:
     def delete(self, key: Union[str, List[str], Tuple[str]]) -> None:
         """删除数据项"""
         for x in (key if isinstance(key, (list, tuple)) else [key]):
-            x in self.metric and self.metric.pop(x)
+            self.metric.pop(x, None)
 
     def has_key(self, key: str):
         """是否存在相应的键"""

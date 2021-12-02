@@ -36,3 +36,12 @@ alarm:
       # 响应头包含
       headers:
         Server: DataRouter
+
+# 报警后数据处理
+after:
+  # 丢弃数据字段
+  use_plugin_discard:
+    # 数据标识 tag 字段名称, all 表示所有标识
+    all:
+      - headers
+      - response

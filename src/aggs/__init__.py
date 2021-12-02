@@ -6,9 +6,6 @@
 
     :author: Fufu, 2021/6/7
 """
-from asyncio import create_task
-from typing import Any
-
 from loguru import logger
 
 from ..libs.metric import Metric
@@ -29,8 +26,14 @@ class AggsPlugin(BasePlugin):
             metric = await self.in_queue.get()
             is_closed = metric.is_closed
 
-            # 数据分发
-            create_task(self.alarm(metric))
+            # 分发前(报警前)数据处理
+            metric = await self.use_common_plugin(metric, 'befor')
+
+            # 数据分发(报警)
+            metric = await self.alarm(metric)
+
+            # 分发后(报警后)数据处理
+            metric = await self.use_common_plugin(metric, 'after')
 
             # 传递数据
             self.out_queue.put_nowait(metric)
@@ -38,9 +41,9 @@ class AggsPlugin(BasePlugin):
 
         logger.debug(f'{self.module}.{self.name}({self.alias}) is closed')
 
-    async def alarm(self, metric: Metric) -> Any:
+    async def alarm(self, metric: Metric) -> Metric:
         """报警器"""
-        pass
+        return metric
 
     def put_alarm_metric(
             self,

@@ -7,6 +7,7 @@
     :author: kerrygao, Fufu, 2021/6/10
 """
 from . import AggsPlugin
+from ..libs.metric import Metric
 
 
 class Network(AggsPlugin):
@@ -14,7 +15,7 @@ class Network(AggsPlugin):
 
     name = 'network'
 
-    async def alarm(self, metric):
+    async def alarm(self, metric: Metric) -> Metric:
         """报警"""
         # 网卡名
         nic = metric.get('nic')
@@ -34,3 +35,5 @@ class Network(AggsPlugin):
             if kbps_out >= kbps_out_limit:
                 more = self.get_plugin_conf_value(f'alarm|{nic}|comment', '')
                 self.put_alarm_metric(f'{nic} 流出带宽(kbps): {kbps_out}>{kbps_out_limit}', more=more)
+
+        return metric

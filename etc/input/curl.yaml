@@ -19,6 +19,7 @@ target:
   指定IP请求示例:
     # 请求 URL 为域名指定的解析结果, 类似 curl --resolve
     url: https://79.98.145.42:443/short
-    # 指定请求主机名, 不区分大小写
+    # 指定请求主机名, 可以不区分大小写
     headers:
+      # Host 请保持首字母大写
       Host: ip.42.pl

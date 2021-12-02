@@ -32,6 +32,7 @@
 
 ```shell
 pip3 install -r requirements.txt
+# source ./scripts/etc-profile.d-pyagent.sh
 python3 main.py
 # nohup ./main.py >./log/run.log 2>&1 &
 ```
@@ -70,7 +71,13 @@ root@DevBeta:~/py/pyagent# python3 main.py
 
 (注: 若要打包请看: `src/conf/config.py` 中 `self.plugins = PLUGINS` 处的注释, 如果要在 Windows 7 或 2008 上运行, 最好使用 Python-3.8)
 
-`dist` 是单配置文件示例.
+`dist` 目录中是单配置文件示例, 打包后运行目录中的 `main.exe` 即可.
+
+如果启用了获取远程配置, 在 Windows 下可能需要设置环境变量后重启才能生效.
+
+也可以临时设置环境并运行: 
+
+`set PYAGENT_CONFIG_API_KEY=bbM1VU6LkCDM3pV67ELEBDvgH4YTkeoaBypVQhJYUuzwvZ && main.exe`
 
 打包命令参考:
 

@@ -4,3 +4,9 @@ alarm:
 
   # 小于 15 的数报警, <
   limit: 15
+
+after:
+  # 报警后数据处理, 将使用公共插件: Discard, 丢弃掉 demo_discard 字段
+  use_plugin_discard:
+    all:
+      - demo_discard

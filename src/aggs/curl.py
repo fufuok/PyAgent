@@ -18,7 +18,7 @@ class Curl(AggsPlugin):
 
     name = 'curl'
 
-    async def alarm(self, metric: Metric) -> None:
+    async def alarm(self, metric: Metric) -> Metric:
         """报警"""
         # 公共报警规则
         for name, conf in self.get_plugin_conf_value('alarm|all', {}).items():
@@ -29,7 +29,8 @@ class Curl(AggsPlugin):
             ok, info = getattr(self, fn_name)(metric, conf)
             if not ok:
                 info = '{} - {}'.format(metric.get('tag'), info)
-                return self.put_alarm_metric(info, more=metric.get('url', ''))
+                self.put_alarm_metric(info, more=metric.get('url', ''))
+                break
 
         # 标识指定报警规则
         for tag, tag_conf in self.get_plugin_conf_value('alarm|target', {}).items():
@@ -44,7 +45,10 @@ class Curl(AggsPlugin):
                 ok, info = getattr(self, fn_name)(metric, conf)
                 if not ok:
                     info = '{} - {}'.format(metric.get('tag'), info)
-                    return self.put_alarm_metric(info, more=metric.get('url', ''))
+                    self.put_alarm_metric(info, more=metric.get('url', ''))
+                    break
+
+        return metric
 
     @staticmethod
     def chk_status(metric: Metric, conf: List[int]) -> Tuple[bool, str]:

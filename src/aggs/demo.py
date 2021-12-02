@@ -17,10 +17,10 @@ class Demo(AggsPlugin):
 
     name = 'demo'
 
-    async def alarm(self, metric: Metric) -> None:
+    async def alarm(self, metric: Metric) -> Metric:
         """报警"""
         if metric.get('x', 0) >= self.get_plugin_conf_value('alarm|limit', 0):
-            return
+            return metric
 
         # 附加报警数据
         metric = metric.clone()
@@ -31,3 +31,5 @@ class Demo(AggsPlugin):
 
         # 新生成报警数据
         self.put_alarm_metric('示例报警数据', more='报警附加消息')
+
+        return metric

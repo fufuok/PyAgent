@@ -6,7 +6,7 @@
 
     :author: Fufu, 2021/6/7
 """
-from random import randint
+from random import randint, random
 
 from . import InputPlugin
 
@@ -23,6 +23,8 @@ class Demo(InputPlugin):
             'x': randint(6, 30),
             'total': randint(1234, 9999999),
             'testin': randint(1234, 9999999),
+            'test_float': random(),
+            'demo_discard': '这个字段将最终被丢弃',
         })
 
         self.out_queue.put_nowait(metric)

@@ -15,10 +15,10 @@ class Telnet(AggsPlugin):
 
     name = 'telnet'
 
-    async def alarm(self, metric: Metric) -> None:
+    async def alarm(self, metric: Metric) -> Metric:
         """报警"""
         if not self.get_plugin_conf_value('alarm'):
-            return
+            return metric
 
         # 待报警标识
         tags = [] if self.get_plugin_conf_value('alarm|all') else self.get_plugin_conf_value('alarm|target', [])
@@ -27,3 +27,5 @@ class Telnet(AggsPlugin):
         tag = metric.get('tag')
         if tag and (not tags or tag in tags) and not metric.get('yes'):
             self.put_alarm_metric('{} - Telnet 端口不通'.format(tag), more=metric.get('address'))
+
+        return metric

@@ -7,6 +7,7 @@
     :author: kerrygao, Fufu, 2021/6/21
 """
 from . import AggsPlugin
+from ..libs.metric import Metric
 
 
 class Ping(AggsPlugin):
@@ -14,11 +15,11 @@ class Ping(AggsPlugin):
 
     name = 'ping'
 
-    async def alarm(self, metric):
+    async def alarm(self, metric: Metric) -> Metric:
         """ping 网络延迟报警"""
         alarm_conf = self.get_plugin_conf_value('alarm', {})
         if not alarm_conf:
-            return
+            return metric
 
         target = metric.get('address')
         tag = metric.get('tag')
@@ -35,3 +36,5 @@ class Ping(AggsPlugin):
 
         elif metric.get('maximum', -1.1) >= maximum >= 0:
             self.put_alarm_metric(f'{tag} 最大延迟过高(ms): {metric.get("maximum")}>={maximum}', more=target)
+
+        return metric

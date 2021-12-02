@@ -33,6 +33,10 @@ use_plugin_converter:
         default_value: 1
         name_override: demo_new_name_recv
         delete_old: True
+  # 浮点数保留2位小数
+  get_round:
+    fields_suffix:
+      - _float
   # 另一个转换函数及配置...
   get_comma:
     fields_prefix:
