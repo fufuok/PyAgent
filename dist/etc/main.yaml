@@ -12,7 +12,7 @@ info:
   # 主 IP, 数据项唯一标识
   node_ip: 0.0.0.1
   # 主机名
-  host: Host001
+  host_name: Host001
 
 # (必须) 启用的数据收集插件
 open:

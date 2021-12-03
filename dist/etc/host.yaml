@@ -4,5 +4,5 @@ aggs:
       loadavg_precent_1: 20.1
       percent: 23
 info:
-  host: LOCAL-TEST
+  host_name: LOCAL-TEST
   node_ip: 127.0.0.1
