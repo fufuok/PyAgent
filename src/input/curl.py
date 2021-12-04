@@ -64,6 +64,7 @@ class Curl(InputPlugin):
             'tag': tag,
             'url': req['url'],
             'method': req['method'],
+            'host': req['headers'].get('Host', ''),
             'response': '',
             'status': 504,
             'headers': {},
@@ -74,6 +75,7 @@ class Curl(InputPlugin):
                 metric.set(**{
                     'response': res,
                     'status': resp.status,
+                    'host': resp.request_info.headers.get('Host', metric.get('host')),
                     'headers': dict(resp.headers),
                 })
                 if self.conf.debug and not resp.ok:
