@@ -21,7 +21,7 @@ from typing import Any, Callable, Optional, Union
 from loguru import logger
 
 
-def try_logger(depth=1, *, as_logger=True, log_tag=""):
+def try_logger(depth=1, *, as_logger=True, log_tag=''):
     """
     带 Logger 的 try
 
@@ -42,9 +42,9 @@ def try_logger(depth=1, *, as_logger=True, log_tag=""):
         def wrapper(*args, **kwargs):
             msg = '{} - {}'.format(log_tag, fn.__name__) if log_tag else fn.__name__
             try:
-                as_logger and logger.opt(depth=depth).info('try {} start'.format(msg))
+                as_logger and logger.opt(depth=depth).debug('try {} start'.format(msg))
                 res = fn(*args, **kwargs)
-                as_logger and logger.opt(depth=depth).info('try {} end'.format(msg))
+                as_logger and logger.opt(depth=depth).debug('try {} end'.format(msg))
                 return res
             except Exception as e:
                 as_logger and logger.opt(exception=True).error('try {} error: {}'.format(msg, e))

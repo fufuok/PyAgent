@@ -26,5 +26,4 @@ class Demo(InputPlugin):
             'test_float': random(),
             'demo_discard': '这个字段将最终被丢弃',
         })
-
         self.out_queue.put_nowait(metric)

@@ -9,6 +9,7 @@
 import psutil
 
 from . import InputPlugin
+from ..libs.helper import try_logger
 from ..libs.humanize import human_bytes
 from ..libs.psutil import to_dict
 
@@ -21,8 +22,9 @@ class Disk(InputPlugin):
 
     async def gather(self):
         """磁盘占用情况"""
-        return await self.to_thread(self.get_disk_info)
+        await self.to_thread(self.get_disk_info)
 
+    @try_logger()
     def get_disk_info(self):
         """磁盘占用情况"""
         for disk in psutil.disk_partitions():

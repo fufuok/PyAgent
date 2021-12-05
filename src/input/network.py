@@ -12,7 +12,7 @@ import time
 import psutil
 
 from . import InputPlugin
-from ..libs.helper import get_round, get_comma, get_int
+from ..libs.helper import get_round, get_comma, get_int, try_logger
 from ..libs.humanize import human_bps
 from ..libs.psutil import to_dict
 
@@ -28,8 +28,9 @@ class Network(InputPlugin):
 
     async def gather(self):
         """获取数据"""
-        return await self.to_thread(self.get_network_info)
+        await self.to_thread(self.get_network_info)
 
+    @try_logger()
     def get_network_info(self):
         """获取网络信息"""
         # 获取网口的流量

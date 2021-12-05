@@ -9,7 +9,7 @@
 import psutil
 
 from . import InputPlugin
-from ..libs.helper import get_round
+from ..libs.helper import get_round, try_logger
 from ..libs.psutil import to_dict
 
 
@@ -21,9 +21,9 @@ class Cpu(InputPlugin):
 
     async def gather(self):
         """获取数据"""
-        metric = await self.to_thread(self.get_cpu_info)
-        self.out_queue.put_nowait(metric)
+        await self.to_thread(self.get_cpu_info)
 
+    @try_logger()
     def get_cpu_info(self):
         """获取 CPU 信息"""
         # CPU 逻辑个数
@@ -62,5 +62,4 @@ class Cpu(InputPlugin):
             'loadavg_precent': loadavg_precent,
             'loadavg_precent_1': loadavg_precent_1,
         })
-
-        return metric
+        self.out_queue.put_nowait(metric)
