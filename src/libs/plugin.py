@@ -13,6 +13,7 @@ from asyncio import Queue, events
 from contextvars import copy_context
 from typing import Any, List, Optional, Tuple, Union
 
+from .fn import gen_data_fn
 from .metric import Metric
 
 
@@ -31,6 +32,8 @@ class RootPlugin(ABC):
     def __init__(self, conf: Any) -> None:
         # 插件配置
         self.conf = conf
+        # 生成数据函数集
+        self.gen_data_fn = gen_data_fn()
 
     @abstractmethod
     async def run(self) -> None:
@@ -158,6 +161,28 @@ class RootPlugin(ABC):
     def metrics_as_json(metrics: List[Metric]) -> str:
         """指标数据列表转为 JSON"""
         return json.dumps(BasePlugin.metrics_as_dict(metrics)) if metrics else ''
+
+    def use_func_data(self, conf_func: List[str], data: Optional[dict] = None) -> dict:
+        """根据配置执行数据项生成函数"""
+        data = data if isinstance(data, dict) else {}
+        for c in conf_func:
+            c = str(c)
+            fn_args = c.split(',,')
+            fn = self.gen_data_fn.get(fn_args[0])
+            if not fn:
+                continue
+
+            args = fn_args[1:] if len(fn_args) > 1 else []
+            try:
+                res = fn(*args)
+            except Exception as e:
+                # 异常时把函数名作为参数传递(以便调试)
+                res = {c: str(e)}
+
+            # 合并数据项
+            data.update(res)
+
+        return data
 
     @staticmethod
     async def to_thread(func, /, *args, **kwargs):

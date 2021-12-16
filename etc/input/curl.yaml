@@ -23,3 +23,21 @@ target:
     headers:
       # Host 请保持首字母大写
       Host: ip.42.pl
+  DemoCharge:
+    url: http://demo.charge.cn/api/healthcheck
+    method: post
+    type: json
+    # 是否将响应内容(请求失败时忽略)合并到指标数据
+    merge_response: true
+    # 附加函数返回值到 data
+    use_func_data:
+      # 函数名,,参数1,,参数2
+      - sign_charge,,bbNiGiFzSCW4BCR4ew4WFLfM2849u36AqfGooJk1L5Quwt
+    # 请求失败时, 重试 1 次, 可指定重试的状态码, 默认为 [500, 502]
+    retry:
+      attempts: 1
+      statuses:
+        - 500
+        - 502
+        - 504
+        - 429
