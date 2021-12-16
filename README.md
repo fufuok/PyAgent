@@ -82,7 +82,7 @@ root@DevBeta:~/py/pyagent# python3 main.py
 打包命令参考:
 
 ```shell
-pyinstaller -p E:\Python\github\PyAgent\venvw\Lib\site-packages -F main.py -i doc\f.ico
+pyinstaller -p E:\Python\github\PyAgent\venvw38\Lib\site-packages -F main.py -i doc\f.ico
 ```
 
 ![windows-demo](doc/windows-demo.png)

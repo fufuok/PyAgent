@@ -37,6 +37,11 @@ interval: 60
 alarm:
   code: monitor_metric_alarm
 
+# 日志配置, 可配置文件日志路径, 级别, 滚动大小, 格式等
+log:
+  # 日志级别, 默认 INFO: CRITICAL ERROR WARNING SUCCESS INFO DEBUG
+  level: INFO
+
 ########## 以下是插件相关默认配置, 单独的插件配置文件优先(插件配置必须是字典, 配置区分大小写!!!) ##########
 
 # 输入插件默认配置

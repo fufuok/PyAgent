@@ -2,7 +2,7 @@
 debug: True
 
 # 配置热加载周期, 秒, 默认 300 秒, 最小 10 秒
-reload_sec: 300
+reload_sec: 30
 # 配置获取 API, 为空或注释掉则不主动拉取配置
 # update_api: http://api.demo.com/api/get_pyagent_config
 
