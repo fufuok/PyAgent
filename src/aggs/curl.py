@@ -9,7 +9,7 @@
 from typing import List, Tuple
 
 from . import AggsPlugin
-from ..libs.helper import get_json_loads
+from ..libs.helper import get_dict_value, get_json_loads
 from ..libs.metric import Metric
 
 
@@ -20,20 +20,59 @@ class Curl(AggsPlugin):
 
     async def alarm(self, metric: Metric) -> Metric:
         """报警"""
-        # 公共报警规则
-        for name, conf in self.get_plugin_conf_value('alarm|all', {}).items():
+        alarm_conf = self.get_plugin_conf_value('alarm', {})
+        if not alarm_conf:
+            return metric
+
+        # 获取报警时使用的指标字段
+        metric_tag = metric.get('tag')
+        msg_fields = self.get_msg_fields(alarm_conf, metric_tag)
+
+        # 优先使用指定 tag 报警
+        self.alarm_target(metric, alarm_conf, msg_fields) or self.alarm_all(metric, alarm_conf, msg_fields)
+
+        return metric
+
+    @staticmethod
+    def get_msg_fields(alarm_conf: dict, metric_tag: str) -> List[str]:
+        msg_conf = get_dict_value(alarm_conf, 'use_msg_fields', {})
+        if not msg_conf:
+            return []
+
+        # 优先使用指定 tag 项的配置
+        msg_fields = get_dict_value(msg_conf, metric_tag, [])
+
+        if not msg_fields and metric_tag not in get_dict_value(msg_conf, 'all_except', []):
+            msg_fields = get_dict_value(msg_conf, 'all', [])
+
+        return msg_fields
+
+    def alarm_all(self, metric: Metric, alarm_conf: dict, msg_fields: list) -> bool:
+        """检查全局报警"""
+        all_conf = get_dict_value(alarm_conf, 'all', {})
+        if not all_conf:
+            return False
+
+        for name, conf in all_conf.items():
             fn_name = f'chk_{name}'
             if not hasattr(self, fn_name):
                 continue
 
             ok, info = getattr(self, fn_name)(metric, conf)
             if not ok:
-                info = '{} - {}'.format(metric.get('tag'), info)
+                info = '{} - {} {}'.format(metric.get('tag'), info, metric.msg(msg_fields))
                 self.put_alarm_metric(info, more=metric.get('url', ''))
-                break
+                return True
 
-        # 标识指定报警规则
-        for tag, tag_conf in self.get_plugin_conf_value('alarm|target', {}).items():
+        return False
+
+    def alarm_target(self, metric: Metric, alarm_conf: dict, msg_fields: list) -> bool:
+        """标识指定报警规则"""
+        target_conf = get_dict_value(alarm_conf, 'target', {})
+        if not target_conf:
+            return False
+
+        for tag, tag_conf in target_conf.items():
             if metric.get('tag', '') != tag or not isinstance(tag_conf, dict):
                 continue
 
@@ -44,11 +83,11 @@ class Curl(AggsPlugin):
 
                 ok, info = getattr(self, fn_name)(metric, conf)
                 if not ok:
-                    info = '{} - {}'.format(metric.get('tag'), info)
+                    info = '{} - {} {}'.format(metric.get('tag'), info, metric.msg(msg_fields))
                     self.put_alarm_metric(info, more=metric.get('url', ''))
-                    break
+                    return True
 
-        return metric
+        return False
 
     @staticmethod
     def chk_status(metric: Metric, conf: List[int]) -> Tuple[bool, str]:
@@ -76,7 +115,8 @@ class Curl(AggsPlugin):
 
         if conf and isinstance(conf, dict):
             for k, v in conf.items():
-                if str(js.get(k)) != str(v):
+                v = '' if v is None else str(v)
+                if str(js.get(k)) != v:
                     return False, f'返回值: {k} != {v}'
 
         return True, ''
@@ -90,7 +130,19 @@ class Curl(AggsPlugin):
 
         if conf and isinstance(conf, dict):
             for k, v in conf.items():
-                if str(headers.get(k)) != str(v):
+                v = '' if v is None else str(v)
+                if str(headers.get(k)) != v:
                     return False, f'响应头: {k} != {v}'
+
+        return True, ''
+
+    @staticmethod
+    def chk_metric(metric: Metric, conf: dict) -> Tuple[bool, str]:
+        """检查指标数据是否包含相应键值"""
+        if conf and isinstance(conf, dict):
+            for k, v in conf.items():
+                v = '' if v is None else str(v)
+                if str(metric.get(k)) != v:
+                    return False, f'数据项: {k} != {v}'
 
         return True, ''

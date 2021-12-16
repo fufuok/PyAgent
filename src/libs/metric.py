@@ -90,7 +90,14 @@ class Metric:
 
     def keys(self, scope: Optional[Union[list, tuple, set]] = None) -> list:
         """获取数据键名列表"""
-        return list(set(self.metric.keys()) & set(scope)) if scope else self.metric.keys()
+        if isinstance(scope, (list, tuple, set)):
+            ks = self.metric.keys()
+            return [k for k in scope if k in ks]
+        return list(self.metric.keys())
+
+    def msg(self, fields: Optional[List[str]] = None, sep: str = ', ') -> str:
+        """提取指标字段生成文本消息"""
+        return sep.join([self.get(k, '') for k in self.keys(fields)])
 
     @property
     def as_dict(self) -> dict:

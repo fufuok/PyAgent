@@ -24,7 +24,13 @@ alarm:
     #headers:
     #  Server: nginx
 
-  # 指定标识报警, 规则设置方法与上面一致, 仅生效于对应的标记
+    # 6. 检查指标数据字段值, 均转为字符串比较, 值留空或 '' 表示空字符串, 配合 input 中 merge_response: true 使用
+    #metric:
+    #  ok: 1
+    #  code: 0
+    #  msg:
+
+  # 指定标识报警, 优先使用, 规则设置方法与上面一致, 仅生效于对应的标记
   target:
     百度(GET):
       # 返回值包含
@@ -36,12 +42,43 @@ alarm:
       # 响应头包含
       headers:
         Server: DataRouter
+    DemoCharge:
+      # 指标字段中必须包含 ok: 1, code: 0 的键值, 并 msg 字段为空字符串
+      metric:
+        ok: 1
+        code: 0
+        msg: ''
+
+
+    # 可选指定使用响应内容中的错误消息字段(响应内容为JSON时才会有效), 多个字段自动拼接
+  use_msg_fields:
+    all:
+      - errmsg
+      - exception
+    all_except:
+      # 注: 指定的是要排除的 tag
+      - 指定IP请求示例
+    # 按指定的 tag 设置, 优先
+    示例(POST):
+      - errmsg
+      - errcode
+      - exception
+    DemoCharge:
+      - msg
+      - status
+      - exception
 
 # 报警后数据处理
 after:
   # 丢弃数据字段
   use_plugin_discard:
-    # 数据标识 tag 字段名称, all 表示所有标识
+    # 数据标识 tag 字段名称, all 表示所有标识, all_except 表示 all 的例外
+    # 比如这个 tag(指定IP请求示例) 保留 response, 其他全部去掉 response 和 headers
     all:
       - headers
       - response
+    all_except:
+      # 注: 指定的是要排除的 tag, 将不会丢弃数据字段, 除非单独以 TAG 方式指定了要丢弃的字段
+      - DemoCharge
+    指定IP请求示例:
+      - headers
