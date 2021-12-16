@@ -6,9 +6,10 @@
 
     :author: Fufu, 2021/11/10
 """
+from typing import Any
 
 
-def to_dict(obj):
+def to_dict(obj: Any) -> dict:
     """对象转字典"""
     if hasattr(obj, '_asdict'):
         return obj._asdict()

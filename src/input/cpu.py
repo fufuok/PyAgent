@@ -55,7 +55,7 @@ class Cpu(InputPlugin):
             'percent': percent,
             'percent_percpu': percent_percpu,
             'max_percent': max_percent,
-            'times': to_dict(times),
+            'times': {k: get_round(v) for k, v in to_dict(times).items()},
             'times_percent': to_dict(times_percent),
             'stats': to_dict(stats),
             'loadavg': loadavg,
