@@ -416,14 +416,10 @@ def get_hash(data=None, hash_name='md5', salt=''):
         return ''
 
 
-def get_json_loads(s, default=False):
-    """
-    屏蔽错误, 加载 JSON
-
-    :param s:
-    :param default:
-    :return:
-    """
+def get_json_loads(s: Any, default: bool = False) -> dict:
+    """屏蔽错误, 加载 JSON"""
+    if isinstance(s, dict):
+        return s
     try:
         return json.loads(s)
     except Exception:
@@ -619,7 +615,7 @@ def get_bool(v: Any) -> bool:
     return str(v) in ('1', 't', 'T', 'true', 'TRUE', 'True')
 
 
-def extend_dict(a: dict, b: dict, merge_sub_dict: bool = True) -> dict:
+def merge_dicts(a: dict, b: dict, merge_sub_dict: bool = True) -> dict:
     """
     深拷贝, 扩展合并字典
     默认包含对下级字典合并, 保留只在 a 中存在的键值

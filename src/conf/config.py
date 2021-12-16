@@ -17,7 +17,8 @@ from loguru import logger
 from yaml import safe_dump, safe_load
 
 from .plugins import PLUGINS
-from ..libs.helper import extend_dict, get_dict_value, get_hash
+from ..env import COMMON_KEY
+from ..libs.helper import merge_dicts, get_dict_value, get_hash
 from ..libs.net import request
 
 
@@ -85,11 +86,11 @@ class Config:
         # Windows: set PYAGENT_CONFIG_API_KEY=*****
         # Linux: export PYAGENT_CONFIG_API_KEY=*****
         # 加密方法如下, 用 encrypted 的值替换上面 ***** 的内容:
-        # encrypted = set_environ('tmp', '您的TOKEN值-Test', '自定义的加密密钥')
+        # encrypted = set_environ('tmp', '您的TOKEN值-Test', COMMON_KEY)
         # print(f'export PYAGENT_CONFIG_API_KEY={encrypted}')
         # 如: Linux 里执行: export PYAGENT_CONFIG_API_KEY=bbM1VU6LkCDM3pV67ELEBDvgH4YTkeoaBypVQhJYUuzwvZ
         # 程序里使用下面的代码解密后使用
-        api_key = get_environ('PYAGENT_CONFIG_API_KEY', '自定义的加密密钥')
+        api_key = get_environ('PYAGENT_CONFIG_API_KEY', COMMON_KEY, '')
         timestamp = int(time.time())
         token = get_hash(f'{timestamp}{api_key}')
 
@@ -118,16 +119,16 @@ class Config:
             return
 
         # 合并本地主配置: etc/main/main.yaml 优先于 etc/main.yaml
-        main = extend_dict(main, self.get_conf('main', 'main'))
+        main = merge_dicts(main, self.get_conf('main', 'main'))
 
         # 加载主机个性化主配置: etc/host.yaml
         host = self.load_yaml_file(self.host_yaml)
 
         # 合并本地主机个性化配置: etc/main/host.yaml 优先于 etc/host.yaml
-        host = extend_dict(host, self.get_conf('main', 'host'))
+        host = merge_dicts(host, self.get_conf('main', 'host'))
 
         # 扩展合并主配置: host.yaml 优先于 main.yaml
-        self.main = extend_dict(main, host)
+        self.main = merge_dicts(main, host)
 
         self.debug = self.get_conf_value('main|debug', False)
         self.info = self.get_conf_value('main|info', {})
@@ -220,7 +221,7 @@ class Config:
         """写入 YAML 配置文件"""
         try:
             with open(yaml_file, 'w', encoding='utf-8') as f:
-                return safe_dump(data, f, allow_unicode=True)
+                return safe_dump(data, f, allow_unicode=True, sort_keys=False)
         except Exception as e:
             logger.warning(f'配置文件写入失败: {e}')
             return ''
@@ -287,7 +288,7 @@ class Config:
         # 文件日志
         logger.add(
             self.get_conf_value('main|log|file', os.path.join(self.root_dir, 'log', 'pyagent.log')),
-            level=self.get_conf_value('main|log|level', 'INFO'),
+            level=self.get_conf_value('main|log|level', 'WARNING'),
             rotation=self.get_conf_value('main|log|rotation', '50 MB'),
             retention=self.get_conf_value('main|log|retention', '10 days'),
             compression=self.get_conf_value('main|log|compression', 'zip'),

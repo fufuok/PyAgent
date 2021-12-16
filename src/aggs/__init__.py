@@ -57,8 +57,8 @@ class AggsPlugin(BasePlugin):
         alarm_metric = self.metric(
             {
                 'code': self.get_conf_value('alarm|code', 'alarm') if code == '' else str(code),
-                'info': str(info),
-                'more': str(more) if more else self.get_plugin_conf_value('alarm|comment', ''),
+                'info': str(info).strip(),
+                'more': str(more).strip() if more else self.get_plugin_conf_value('alarm|comment', ''),
             },
             tag='alarm' if tag == '' else str(tag),
         )
