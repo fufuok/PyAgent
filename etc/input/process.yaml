@@ -1,0 +1,11 @@
+# 采集时间间隔(秒)
+interval: 60
+
+# 指定要采集的进程名, 不指定会采集所有进程
+target:
+  - chrome.exe
+  - Code.exe
+  - firefox.exe
+  - python3
+  - sshd
+  - bash

@@ -8,11 +8,12 @@
 """
 from ..common import converter, discard
 from ..input import (demo as input_demo, cpu as input_cpu, mem as input_mem, disk as input_disk,
-                     network as input_network, curl as input_curl, telnet as input_telnet, ping as input_ping)
+                     network as input_network, curl as input_curl, telnet as input_telnet,
+                     process as input_process, ping as input_ping)
 from ..processor import default as processor_default, demo as processor_demo
 from ..aggs import (default as aggs_default, demo as aggs_demo, cpu as aggs_cpu, curl as aggs_curl,
                     telnet as aggs_telnet, disk as aggs_disk, mem as aggs_mem, network as aggs_network,
-                    ping as aggs_ping)
+                    process as aggs_process, ping as aggs_ping)
 from ..output import default as output_default, console as output_console, es as output_es
 
 PLUGINS = {
@@ -28,6 +29,7 @@ PLUGINS = {
         'network': input_network.Network,
         'curl': input_curl.Curl,
         'telnet': input_telnet.Telnet,
+        'process': input_process.Process,
         'ping': input_ping.Ping
     },
     'processor': {
@@ -43,6 +45,7 @@ PLUGINS = {
         'disk': aggs_disk.Disk,
         'mem': aggs_mem.Mem,
         'network': aggs_network.Network,
+        'process': aggs_process.Process,
         'ping': aggs_ping.Ping,
     },
     'output': {

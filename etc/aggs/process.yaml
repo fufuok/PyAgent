@@ -1,0 +1,19 @@
+alarm:
+  # 指定要报警的进程名称和报警规则
+  target:
+    demo.exe:
+      comment: 示例配置
+      # 最小进程数（包含）
+      min_process_num: 1
+      # 最大进程数（包含）
+      max_process_num: 1
+      # CPU 占用率, >=
+      cpu_percent: 20
+      # 内存占用率, >=
+      memory_percent: 20
+    chrome.exe:
+      max_process_num: 20
+      memory_percent: 30
+    bash:
+      max_process_num: 3
+      cpu_percent: 20
