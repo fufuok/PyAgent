@@ -10,7 +10,7 @@ import psutil
 
 from . import InputPlugin
 from ..libs.helper import get_round, try_logger
-from ..libs.psutil import to_dict
+from ..libs.psutil import get_process_info, to_dict
 
 
 class Cpu(InputPlugin):
@@ -34,7 +34,7 @@ class Cpu(InputPlugin):
         percent = psutil.cpu_percent(interval=None)
         # CPU 单核使用率
         percent_percpu = psutil.cpu_percent(interval=None, percpu=True)
-        max_percent = max(percent_percpu) if percent_percpu else percent
+        max_percent = max(percent_percpu) if percent_percpu and isinstance(percent_percpu, list) else percent
         # CPU 运行时间
         times = psutil.cpu_times()
         # CPU 运行时间比例
@@ -49,6 +49,13 @@ class Cpu(InputPlugin):
         loadavg_precent = [get_round(x / logical_count * 100) for x in loadavg]
         loadavg_precent_1 = loadavg_precent[0]
 
+        # CPU 占用最高的 n 个进程
+        process_top = []
+        n = self.get_plugin_conf_value('process_top_num', 5)
+        if n:
+            process_top = get_process_info(fields=['pid', 'name', 'cpu_percent'], orderby=['cpu_percent'])
+            process_top = process_top[:n]
+
         metric = self.metric({
             'logical_count': logical_count,
             'count': count,
@@ -61,5 +68,6 @@ class Cpu(InputPlugin):
             'loadavg': loadavg,
             'loadavg_precent': loadavg_precent,
             'loadavg_precent_1': loadavg_precent_1,
+            'process_top': process_top,
         })
         self.out_queue.put_nowait(metric)

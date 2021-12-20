@@ -1,2 +1,5 @@
-# 采集时间间隔(秒), 可忽略, 将使用 main.yaml 中的公共时间间隔
+# 采集时间间隔(秒)
 interval: 60
+
+# 获取占用 CPU 高的 n 个进程
+process_top_num: 5
