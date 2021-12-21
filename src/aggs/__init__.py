@@ -6,6 +6,8 @@
 
     :author: Fufu, 2021/6/7
 """
+from typing import Optional
+
 from loguru import logger
 
 from ..libs.metric import Metric
@@ -49,18 +51,18 @@ class AggsPlugin(BasePlugin):
             self,
             info: str,
             *,
+            data: Optional[dict] = None,
             code: str = '',
             more: str = '',
             tag: str = '',
     ) -> None:
         """生成并推送报警数据"""
-        alarm_metric = self.metric(
-            {
-                'code': self.get_conf_value('alarm|code', 'alarm') if code == '' else str(code),
-                'info': str(info).strip(),
-                'more': str(more).strip() if more else self.get_plugin_conf_value('alarm|comment', ''),
-            },
-            tag='alarm' if tag == '' else str(tag),
-        )
+        data = data if isinstance(data, dict) else {}
+        data.update({
+            'code': self.get_plugin_or_main_conf_value('alarm|code', 'alarm') if code == '' else str(code),
+            'info': str(info).strip(),
+            'more': str(more).strip() if more else self.get_plugin_conf_value('alarm|comment', ''),
+        })
+        alarm_metric = self.metric(data, tag='alarm' if tag == '' else str(tag))
         self.out_queue.put_nowait(alarm_metric)
         logger.debug('alarm_metric: {}', alarm_metric.as_json)

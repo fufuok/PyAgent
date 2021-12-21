@@ -4,8 +4,7 @@
     ~~~~~~~~
     CPU 数据汇聚/报警插件
 
-    :author: kerrygao, Fufu, 2021/6/10
-    :update: Fufu, 2021/11/17 报警优先级: 系统 1 分钟内负载 > CPU 总使用率 > CPU 单核使用率
+    :author: Fufu, 2021/11/17 报警优先级: 系统 1 分钟内负载 > CPU 总使用率 > CPU 单核使用率
 """
 from . import AggsPlugin
 from ..libs.metric import Metric
@@ -28,16 +27,22 @@ class Cpu(AggsPlugin):
             self.put_alarm_metric(f'系统平均负载过高(%): {loadavg_precent_1}>={conf_loadavg_precent_1}')
             return metric
 
+        more = ''
+        data = {}
+        if self.get_plugin_conf_value('alarm|use_process_top', True):
+            data['process_top'] = metric.get('process_top')
+            more = ', '.join(['{pid}.{name}({cpu_percent}%)'.format(**x) for x in data['process_top']])
+
         percent = metric.get('percent', -0.1)
         conf_percent = self.get_plugin_conf_value('alarm|percent', -0.1)
         if percent >= conf_percent >= 0.0:
-            self.put_alarm_metric(f'CPU 总使用率过高(%): {percent}>={conf_percent}')
+            self.put_alarm_metric(f'CPU 总使用率过高(%): {percent}>={conf_percent}', data=data, more=more)
             return metric
 
         max_percent = metric.get('max_percent', -0.1)
         conf_max_percent = self.get_plugin_conf_value('alarm|max_percent', -0.1)
         if max_percent >= conf_max_percent >= 0.0:
-            self.put_alarm_metric(f'CPU 单核使用率过高(%): {max_percent}>={conf_max_percent}')
+            self.put_alarm_metric(f'CPU 单核使用率过高(%): {max_percent}>={conf_max_percent}', data=data, more=more)
             return metric
 
         return metric
