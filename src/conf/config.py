@@ -10,15 +10,15 @@ import os.path
 import sys
 import time
 from hashlib import md5
-from typing import Any, Callable, Union
+from typing import Any, Callable
 
-from envcrypto import get_environ, set_environ
+from envcrypto import get_environ
 from loguru import logger
 from yaml import safe_dump, safe_load
 
 from .plugins import PLUGINS
 from ..env import COMMON_KEY
-from ..libs.helper import merge_dicts, get_dict_value, get_hash
+from ..libs.helper import get_dict_value, get_hash, merge_dicts
 from ..libs.net import request
 
 
@@ -26,7 +26,7 @@ class Config:
     """系统配置"""
     debug = False
     reload_sec = 300
-    windows = os.name == 'nt'
+    is_windows = os.name == 'nt'
 
     # 主配置
     main = {}
@@ -217,14 +217,13 @@ class Config:
         return self.load_yaml_file(os.path.join(self.etc_dir, conf_module, f'{conf_name}.yaml'))
 
     @staticmethod
-    def dump_yaml_file(data: dict, yaml_file: str) -> Union[str, bytes]:
+    def dump_yaml_file(data: dict, yaml_file: str) -> None:
         """写入 YAML 配置文件"""
         try:
             with open(yaml_file, 'w', encoding='utf-8') as f:
                 return safe_dump(data, f, allow_unicode=True, sort_keys=False)
         except Exception as e:
             logger.warning(f'配置文件写入失败: {e}')
-            return ''
 
     @staticmethod
     def load_yaml_file(yaml_file: str) -> dict:
@@ -275,9 +274,10 @@ class Config:
         logger.remove()
 
         if self.debug:
-            # 控制台日志
+            # 控制台日志, Windows 下默认关闭高亮
             logger.add(
                 sys.stderr,
+                colorize=self.get_conf_value('main|log|colorize', not self.is_windows),
                 level='DEBUG',
                 format='<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | '
                        '<level>{level}</level> | '
