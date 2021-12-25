@@ -26,7 +26,7 @@ class Curl(InputPlugin):
     async def gather(self) -> None:
         """按配置发起请求任务"""
         # 并发限制(到同主机)
-        limit = self.get_conf_value('worker_limit', 30)
+        limit = self.get_plugin_conf_value('worker_limit', 30)
         # 创建请求任务
         async with ClientSession(connector=TCPConnector(ssl=False, limit_per_host=limit)) as sess:
             tasks = []
