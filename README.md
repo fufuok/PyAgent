@@ -8,7 +8,7 @@
 - 插件式, 易扩展, 插件自动扫描/静态注册(默认)
 - 轻量协程, 资源占用低, 若有阻塞类代码请放入线程执行
 - 脚手架, 请根据业务需要编写插件即可
-  - 基础插件: `demo`, `cpu`, `mem`, `disk`, `curl`, `network`, `ping`, `telnet`
+  - 基础插件: `demo`, `cpu`, `mem`, `disk`, `process` `curl`, `network`, `ping`, `telnet`
 
 ## 依赖
 
