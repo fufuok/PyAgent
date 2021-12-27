@@ -37,13 +37,13 @@ class Telnet(InputPlugin):
             timeout: int = 5,
     ) -> None:
         """执行检测并发送结果"""
-        yes, n = await self.to_thread(chk_port, address, None, as_ipv6, timeout)
+        yes, errcode = await self.to_thread(chk_port, address, None, as_ipv6, timeout)
         metric = self.metric({
             'tag': tag,
             'address': address,
             'as_ipv6': as_ipv6,
             'timeout': timeout,
             'yes': yes,
-            'n': n,
+            'errcode': errcode,
         })
         self.out_queue.put_nowait(metric)

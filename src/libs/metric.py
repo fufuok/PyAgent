@@ -47,7 +47,7 @@ class Metric:
             fix_type: bool = True
     ) -> Any:
         """获取数据"""
-        value = self.metric.get(key, default)
+        value = self.metric.get(str(key), default)
         return get_same_type(default, value) if fix_type else value
 
     def set(self, **data: Any) -> None:

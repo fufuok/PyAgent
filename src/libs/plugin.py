@@ -54,12 +54,12 @@ class RootPlugin(ABC):
 
         return default if interval < 1 else interval
 
-    def get_conf_value(
+    def get_plugin_or_main_conf_value(
             self,
             key_path: str,
             default: Any = None,
             *,
-            fix_type: bool = True
+            fix_type: bool = True,
     ) -> Any:
         """
         按路径字符串获取配置项值(优先: 当前插件配置项 > 主配置项)
@@ -84,7 +84,7 @@ class RootPlugin(ABC):
             key_path: str = '',
             default: Any = None,
             *,
-            fix_type: bool = True
+            fix_type: bool = True,
     ) -> Any:
         """
         按路径字符串获取配置项值(仅当前插件配置项)
@@ -105,7 +105,7 @@ class RootPlugin(ABC):
             key_path_ab: Union[List, Tuple],
             default: Any = None,
             *,
-            fix_type: bool = True
+            fix_type: bool = True,
     ) -> Any:
         """
         按路径字符串获取配置项值(仅当前插件配置项)
