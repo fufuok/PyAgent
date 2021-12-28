@@ -2,10 +2,17 @@ alarm:
   # 报警的接口名称
   以太网:
     # 报警描述信息
-    comment: 业务量大
+    comment: SQLServer 集群
     # 该接口的流入带宽报警阈值, >=
     kbps_in: 7777
     # 流出带宽报警阈值, >=
     kbps_out: 7777
+    # 集群漂移 IP 监控
+    vip:
+      ipv4: 192.168.3.100
+      ipv6: 240e:333:3ff:e00::ff1
   本地连接:
     kbps_in: 8888
+  eth1:
+    vip:
+      ipv4: 172.1.1.1

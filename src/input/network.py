@@ -4,8 +4,7 @@
     ~~~~~~~~
     网络信息收集插件
 
-    :author: kerrygao, 2021/6/10
-    :update: Fufu, 2021/11/8 代码重构, 支持网卡前缀配置和多 IP
+    :author: Fufu, 2021/11/8 代码重构, 支持网卡前缀配置和多 IP
 """
 import time
 
@@ -92,7 +91,7 @@ class Network(InputPlugin):
         """生成指标数据"""
         metric = {
             'nic': nic,
-            'interval': interval,
+            'interval': get_round(interval),
         }
         metric.update(to_dict(net_if_stats[nic]))
         for snic in net_if_addrs[nic]:
