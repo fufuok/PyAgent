@@ -2,14 +2,14 @@ alarm:
   # 报警描述信息
   comment: CPU
 
-  # (优先) 系统平均负载达到 loadavg_precent_1% 报警 (1 分钟平均值)
-  loadavg_precent_1: 75
-
-  # (次优先) CPU 总使用率达到 percent% 报警
+  # (优先) CPU 总使用率达到 percent% 报警
   percent: 82.3
 
-  # CPU 任一单核使用率达到 max_percent% 报警
+  # (次优先) CPU 任一单核使用率达到 max_percent% 报警
   max_percent: 90.5
+
+  # 系统平均负载达到 loadavg_precent_1% 报警 (1 分钟平均值)
+  loadavg_precent_1: 75
 
   # 是否在 CPU 占用高的报警消息中附带 TOP n 的进程, 默认为 True
   use_process_top: True
