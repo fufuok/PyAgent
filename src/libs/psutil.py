@@ -12,7 +12,7 @@ from typing import Any, List, Optional, Union
 
 import psutil
 
-from ..libs.helper import get_int, get_round
+from ..libs.helper import get_date, get_int, get_round
 
 
 def get_process_info(
@@ -55,6 +55,7 @@ def get_process_info(
                 pinfo['memory_percent'] = get_round(pinfo.get('memory_percent', 0), default=0)
             if as_ctime:
                 pinfo['create_time'] = get_int(pinfo.get('create_time', 0), default=0)
+                pinfo['create_at'] = get_date(pinfo['create_time'], out_fmt='iso')
             pinfo_list.append(pinfo)
 
     if not orderby:

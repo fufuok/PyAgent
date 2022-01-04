@@ -306,6 +306,8 @@ def get_date(any_dt=None, in_fmt='%Y-%m-%d', out_fmt='', default=True, add_days=
 
     if not out_fmt:
         return dt
+    if out_fmt == 'iso':
+        return dt.isoformat(timespec='seconds') + '+08:00'
     if out_fmt == 'timestamp000':
         return int(dt.timestamp() * 1000)
     if out_fmt == 'timestamp':
