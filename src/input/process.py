@@ -35,6 +35,6 @@ class Process(InputPlugin):
             target=self.get_plugin_conf_value('target'),
             orderby=['cpu_percent', 'memory_percent'],
         )
-        self.out_queue.put_nowait(self.metric({
+        pinfo_list and self.out_queue.put_nowait(self.metric({
             "pinfo_list": pinfo_list,
         }))
