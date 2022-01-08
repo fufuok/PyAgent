@@ -288,7 +288,7 @@ class Config:
         # 文件日志
         logger.add(
             self.get_conf_value('main|log|file', os.path.join(self.root_dir, 'log', 'pyagent.log')),
-            level=self.get_conf_value('main|log|level', 'WARNING'),
+            level=self.get_conf_value('main|log|level', 'INFO'),
             rotation=self.get_conf_value('main|log|rotation', '50 MB'),
             retention=self.get_conf_value('main|log|retention', '10 days'),
             compression=self.get_conf_value('main|log|compression', 'zip'),
