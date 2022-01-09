@@ -22,7 +22,7 @@ class Ping(InputPlugin):
     async def gather(self) -> None:
         """获取数据"""
         # PING 多少次
-        count = self.get_plugin_conf_value('count', 30)
+        count = self.get_plugin_conf_value('count', 60)
         # 每次 PING 多少时间超时 (秒)
         timeout = self.get_plugin_conf_value('timeout', 0.7)
         # 每次 PING 时间间隔 (秒)
