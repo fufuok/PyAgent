@@ -25,6 +25,9 @@ from ..libs.net import request
 class Config:
     """系统配置"""
     debug = False
+    # 每插件启动延时(秒)
+    delay_sec = 1
+    # 配置重新加载时间间隔(秒)
     reload_sec = 300
     is_windows = os.name == 'nt'
 
@@ -132,6 +135,7 @@ class Config:
 
         self.debug = self.get_conf_value('main|debug', False)
         self.info = self.get_conf_value('main|info', {})
+        self.delay_sec = min(self.get_conf_value('main|delay_sec', 1), 30)
         self.reload_sec = max(self.get_conf_value('main|reload_sec', 300), 10)
         self.plugins_open = get_dict_value(self.main, 'open', set())
 

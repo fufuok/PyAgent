@@ -81,6 +81,7 @@ async def start_plugins():
     """启动插件"""
     plugins = CONF.plugins_open - CONF.plugins_working
     for name in plugins:
+        CONF.delay_sec and await sleep(CONF.delay_sec)
         # 数据采集插件
         cls_input = CONF.get_plugin_obj('input', name)
         if not cls_input:
