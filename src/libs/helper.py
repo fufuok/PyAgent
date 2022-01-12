@@ -10,6 +10,7 @@ import hashlib
 import json
 import re
 import socket
+import time
 from copy import deepcopy
 from datetime import date, datetime, timedelta
 from decimal import Decimal
@@ -43,8 +44,10 @@ def try_logger(depth=1, *, as_logger=True, log_tag=''):
             msg = '{} - {}'.format(log_tag, fn.__name__) if log_tag else fn.__name__
             try:
                 as_logger and logger.opt(depth=depth).debug('try {} start'.format(msg))
+                start = time.perf_counter()
                 res = fn(*args, **kwargs)
-                as_logger and logger.opt(depth=depth).debug('try {} end'.format(msg))
+                cost = time.perf_counter() - start
+                as_logger and logger.opt(depth=depth).debug('try {} end, cost: {:.6f}'.format(msg, cost))
                 return res
             except Exception as e:
                 as_logger and logger.opt(exception=True).error('try {} error: {}'.format(msg, e))
