@@ -19,7 +19,7 @@ class Cpu(InputPlugin):
     # 模块名称
     name = 'cpu'
 
-    async def gather(self):
+    async def run_gather(self):
         """获取数据"""
         await self.to_thread(self.get_cpu_info)
 

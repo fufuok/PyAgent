@@ -6,11 +6,12 @@
 
     :author: Fufu, 2021/6/16
 """
-from asyncio import create_task
+from asyncio import ensure_future
 from typing import Union
 
 from . import InputPlugin
 from ..libs.helper import get_dict_value
+from ..libs.metric import Metric
 from ..libs.net import chk_port
 
 
@@ -21,21 +22,29 @@ class Telnet(InputPlugin):
     name = 'telnet'
 
     async def gather(self) -> None:
+        """获取数据(允许堆叠)"""
+        await self.perf_gather()
+
+    async def run_gather(self) -> None:
         """获取数据"""
+        tasks = []
         for tag, conf in self.get_plugin_conf_value('target', {}).items():
             address = get_dict_value(conf, 'address', '').strip()
             if address:
                 as_ipv6 = get_dict_value(conf, 'ipv6', False)
                 timeout = get_dict_value(conf, 'timeout', 5)
-                create_task(self.put_metric(tag, address, as_ipv6, timeout))
+                tasks.append(ensure_future(self.run_telnet(tag, address, as_ipv6, timeout)))
 
-    async def put_metric(
+        # 等待任务执行
+        tasks and await self.run_tasks(tasks)
+
+    async def run_telnet(
             self,
             tag: str,
             address: Union[str, tuple, list],
             as_ipv6: bool = False,
             timeout: int = 5,
-    ) -> None:
+    ) -> Metric:
         """执行检测并发送结果"""
         yes, errcode = await self.to_thread(chk_port, address, None, as_ipv6, timeout)
         metric = self.metric({
@@ -46,4 +55,4 @@ class Telnet(InputPlugin):
             'yes': yes,
             'errcode': errcode,
         })
-        self.out_queue.put_nowait(metric)
+        return metric

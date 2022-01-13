@@ -20,7 +20,7 @@ class Disk(InputPlugin):
     # 模块名称
     name = 'disk'
 
-    async def gather(self):
+    async def run_gather(self):
         """磁盘占用情况"""
         await self.to_thread(self.get_disk_info)
 

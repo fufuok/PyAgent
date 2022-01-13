@@ -20,7 +20,7 @@ class Mem(InputPlugin):
     # 模块名称
     name = 'mem'
 
-    async def gather(self):
+    async def run_gather(self):
         """获取数据"""
         await self.to_thread(self.get_mem_info)
 

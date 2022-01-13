@@ -25,7 +25,7 @@ class Network(InputPlugin):
     # 存储上一时间的网卡数据
     last_data = {}
 
-    async def gather(self):
+    async def run_gather(self):
         """获取数据"""
         await self.to_thread(self.get_network_info)
 

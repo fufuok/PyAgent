@@ -6,7 +6,7 @@
 
     :author: Fufu, 2021/6/15
 """
-from asyncio import as_completed, ensure_future, sleep
+from asyncio import ensure_future, sleep
 from typing import Any
 
 from aiohttp import ClientSession, TCPConnector
@@ -24,6 +24,10 @@ class Curl(InputPlugin):
     name = 'curl'
 
     async def gather(self) -> None:
+        """获取数据(允许堆叠)"""
+        await self.perf_gather()
+
+    async def run_gather(self) -> None:
         """按配置发起请求任务"""
         # 并发限制(到同主机)
         limit = self.get_plugin_conf_value('worker_limit', 30)
@@ -78,18 +82,12 @@ class Curl(InputPlugin):
                 self.conf.debug and logger.error(f'curl exception, req={req} err={e}')
             # 1 秒后重试
             await sleep(1)
-            i >= 0 and logger.warning(f'retry({i+1}) curl {status}, url={url}')
+            i >= 0 and logger.warning(f'retry({i + 1}) curl {status}, url={url}')
 
         # 附加异常报警
         exception and metric.set(exception=exception)
 
         return metric
-
-    async def run_tasks(self, tasks: list) -> None:
-        """接收请求结果并推送"""
-        for task in as_completed(tasks):
-            metric = await task
-            self.out_queue.put_nowait(metric)
 
     @staticmethod
     def get_retry_conf(conf: dict) -> dict:

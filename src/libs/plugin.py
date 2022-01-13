@@ -6,12 +6,15 @@
 
     :author: Fufu, 2021/6/9
 """
-import functools
 import json
 from abc import ABC, abstractmethod
 from asyncio import Queue, events
+from contextlib import asynccontextmanager
 from contextvars import copy_context
-from typing import Any, List, Optional, Tuple, Union
+from functools import partial
+from typing import Any, Callable, List, Optional, Tuple, Union
+
+from loguru import logger
 
 from .fn import gen_data_fn
 from .metric import Metric
@@ -28,6 +31,9 @@ class RootPlugin(ABC):
 
     # 别名, 指当前实例代表哪个插件
     alias = ''
+
+    # 简单锁, 非线程安全, 防止类实例方法重复运行
+    lock = False
 
     def __init__(self, conf: Any) -> None:
         # 插件配置
@@ -185,7 +191,7 @@ class RootPlugin(ABC):
         return data
 
     @staticmethod
-    async def to_thread(func, /, *args, **kwargs):
+    async def to_thread(func: Callable, /, *args, **kwargs):
         """
         来自于 python3.9+ asyncio.to_thread, 在协程中异步执行阻塞事件
 
@@ -200,8 +206,24 @@ class RootPlugin(ABC):
         """
         loop = events.get_running_loop()
         ctx = copy_context()
-        func_call = functools.partial(ctx.run, func, *args, **kwargs)
+        func_call = partial(ctx.run, func, *args, **kwargs)
         return await loop.run_in_executor(None, func_call)
+
+    @asynccontextmanager
+    async def only_one(self):
+        """同一时间, 实例中的该方法只允许运行一个"""
+        if self.lock:
+            logger.warning(f'{self.module}.{self.name} 被重复运行')
+            yield False
+            return
+
+        self.lock = True
+        try:
+            yield True
+        except Exception as e:
+            logger.error(f'{self.module}.{self.name} 运行错误: {e}')
+        finally:
+            self.lock = False
 
 
 class BasePlugin(RootPlugin, ABC):
