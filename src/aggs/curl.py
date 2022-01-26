@@ -61,7 +61,7 @@ class Curl(AggsPlugin):
             ok, info = getattr(self, fn_name)(metric, conf)
             if not ok:
                 info = '{} - {} {}'.format(metric.get('tag'), info, metric.msg(msg_fields))
-                self.put_alarm_metric(info, more=metric.get('url', ''))
+                self.put_alarm_metric(info, tag=metric.get('tag'), more=metric.get('url', ''))
                 return True
 
         return False
@@ -84,7 +84,7 @@ class Curl(AggsPlugin):
                 ok, info = getattr(self, fn_name)(metric, conf)
                 if not ok:
                     info = '{} - {} {}'.format(metric.get('tag'), info, metric.msg(msg_fields))
-                    self.put_alarm_metric(info, more=metric.get('url', ''))
+                    self.put_alarm_metric(info, tag=tag, more=metric.get('url', ''))
                     return True
 
         return False

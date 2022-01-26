@@ -29,12 +29,12 @@ class Ping(AggsPlugin):
         maximum = self.get_plugin_conf_ab_value([f'alarm|target|{tag}|maximum', 'alarm|maximum'], -0.1)
 
         if metric.get('loss', -1.1) >= loss >= 0:
-            self.put_alarm_metric(f'{tag} 丢包比例过高(%): {metric.get("loss")}>={loss}', more=target)
+            self.put_alarm_metric(f'{tag} 丢包比例过高(%): {metric.get("loss")}>={loss}', tag=tag, more=target)
 
         elif metric.get('average', -1.1) >= average >= 0:
-            self.put_alarm_metric(f'{tag} 平均延迟过高(ms): {metric.get("average")}>={average}', more=target)
+            self.put_alarm_metric(f'{tag} 平均延迟过高(ms): {metric.get("average")}>={average}', tag=tag, more=target)
 
         elif metric.get('maximum', -1.1) >= maximum >= 0:
-            self.put_alarm_metric(f'{tag} 最大延迟过高(ms): {metric.get("maximum")}>={maximum}', more=target)
+            self.put_alarm_metric(f'{tag} 最大延迟过高(ms): {metric.get("maximum")}>={maximum}', tag=tag, more=target)
 
         return metric

@@ -51,18 +51,21 @@ class AggsPlugin(BasePlugin):
             self,
             info: str,
             *,
+            tag: str = '',
+            flag: str = '',
             data: Optional[dict] = None,
             code: str = '',
             more: str = '',
-            tag: str = '',
     ) -> None:
-        """生成并推送报警数据"""
+        """生成并推送报警数据, tag, flag 为报警数据内部标识字段"""
         data = data if isinstance(data, dict) else {}
         data.update({
             'code': self.get_plugin_or_main_conf_value('alarm|code', 'alarm') if code == '' else str(code),
             'info': str(info).strip(),
+            'tag': str(tag),
+            'flag': str(flag),
             'more': str(more).strip() if more else self.get_plugin_conf_value('alarm|comment', ''),
         })
-        alarm_metric = self.metric(data, tag='alarm' if tag == '' else str(tag))
+        alarm_metric = self.metric(data, tag='alarm')
         self.out_queue.put_nowait(alarm_metric)
         logger.debug('alarm_metric: {}', alarm_metric.as_json)

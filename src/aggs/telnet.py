@@ -26,6 +26,6 @@ class Telnet(AggsPlugin):
         # 数据中的 tag
         tag = metric.get('tag')
         if tag and (not tags or tag in tags) and not metric.get('yes'):
-            self.put_alarm_metric('{} - Telnet 端口不通'.format(tag), more=metric.get('address'))
+            self.put_alarm_metric('{} - Telnet 端口不通'.format(tag), tag=tag, more=metric.get('address'))
 
         return metric

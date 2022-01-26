@@ -30,6 +30,6 @@ class Demo(AggsPlugin):
         logger.debug('触发报警了: {}', metric.as_json)
 
         # 新生成报警数据
-        self.put_alarm_metric('示例报警数据', more='报警附加消息')
+        self.put_alarm_metric('示例报警数据', tag="demo", flag="test", more='报警附加消息')
 
         return metric

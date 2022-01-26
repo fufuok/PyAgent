@@ -41,14 +41,16 @@ class Network(AggsPlugin):
         if kbps_in_limit >= 0:
             kbps_in = metric.get('kbps_in', 0.0)
             if kbps_in >= kbps_in_limit:
-                self.put_alarm_metric(f'{nic} 流入带宽(kbps): {kbps_in}>{kbps_in_limit}', more=more)
+                self.put_alarm_metric(f'{nic} 流入带宽(kbps): {kbps_in}>{kbps_in_limit}',
+                                      tag=metric.get('nic'), more=more)
 
         # 流出带宽报警
         kbps_out_limit = get_dict_value(alarm_conf, 'kbps_out', -0.1)
         if kbps_out_limit >= 0:
             kbps_out = metric.get('kbps_out', 0.0)
             if kbps_out >= kbps_out_limit:
-                self.put_alarm_metric(f'{nic} 流出带宽(kbps): {kbps_out}>{kbps_out_limit}', more=more)
+                self.put_alarm_metric(f'{nic} 流出带宽(kbps): {kbps_out}>{kbps_out_limit}',
+                                      tag=metric.get('nic'), more=more)
 
     def alarm_vip(self, metric: Metric, alarm_conf: dict, nic: str, more: str = '') -> None:
         """集群漂移 IP 报警"""
@@ -63,8 +65,10 @@ class Network(AggsPlugin):
                     in_now = ip in now_ips
                     flag = metric.get('timestamp')
                     if in_last and not in_now:
-                        self.put_alarm_metric(f'{nic} 减少 IP: {ip}', data={'alarm_flag': f'vip_dec_{flag}'}, more=more)
+                        self.put_alarm_metric(f'{nic} 减少 IP: {ip}',
+                                              tag=metric.get('nic'), flag=f'vip_dec_{flag}', more=more)
                     elif in_now and not in_last:
-                        self.put_alarm_metric(f'{nic} 增加 IP: {ip}', data={'alarm_flag': f'vip_inc_{flag}'}, more=more)
+                        self.put_alarm_metric(f'{nic} 增加 IP: {ip}',
+                                              tag=metric.get('nic'), flag=f'vip_inc_{flag}', more=more)
                 nic_ips[v] = now_ips
             self.last_ips[nic] = nic_ips
