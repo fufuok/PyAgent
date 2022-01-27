@@ -107,7 +107,7 @@ class Metric:
     @property
     def as_json(self) -> str:
         """转换为 JSON 字符串"""
-        return json.dumps(self.metric)
+        return json.dumps(self.metric, ensure_ascii=False)
 
     @property
     def as_text(self) -> str:
