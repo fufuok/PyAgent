@@ -52,7 +52,8 @@ class Process(AggsPlugin):
                     'memory_percent': mem_pct,
                 }
 
-        for proc_name, item in proc_info.items():
+        for proc_name in target_conf:
+            item = proc_info.get(proc_name, {})
             min_process_num = get_dict_value(target_conf, f'{proc_name}|min_process_num', -1)
             max_process_num = get_dict_value(target_conf, f'{proc_name}|max_process_num', -1)
             cpu_percent = get_dict_value(target_conf, f'{proc_name}|cpu_percent', -0.1)
@@ -60,20 +61,21 @@ class Process(AggsPlugin):
             comment = get_dict_value(target_conf, f'{proc_name}|comment', '')
 
             # 进程数检查
-            if min_process_num >= 0 and item['count'] < min_process_num:
-                self.put_alarm_metric(f'{proc_name} 进程数小于配置: {item["count"]}<{min_process_num}', more=comment)
+            count = item.get('count', 0)
+            if min_process_num >= 0 and count < min_process_num:
+                self.put_alarm_metric(f'{proc_name} 进程数小于配置: {count}<{min_process_num}', more=comment)
                 continue
-            if 0 <= max_process_num < item['count']:
-                self.put_alarm_metric(f'{proc_name} 进程数大于配置: {item["count"]}>{max_process_num}', more=comment)
+            if 0 <= max_process_num < count:
+                self.put_alarm_metric(f'{proc_name} 进程数大于配置: {count}>{max_process_num}', more=comment)
                 continue
 
             # CPU 占用
-            if 0 <= cpu_percent <= item['cpu_percent']:
-                cpu_pct = item["cpu_percent"]
+            cpu_pct = item.get('cpu_percent', 0)
+            if 0 <= cpu_percent <= cpu_pct:
                 self.put_alarm_metric(f'{proc_name} CPU占用过高(%): {cpu_pct}>={cpu_percent}', more=comment)
                 continue
 
             # 内存占用
+            mem_pct = get_round(item.get('memory_percent', 0))
             if 0 <= memory_percent <= item['memory_percent']:
-                mem_pct = get_round(item["memory_percent"])
                 self.put_alarm_metric(f'{proc_name} 内存占用过高(%): {mem_pct}>={memory_percent}', more=comment)
