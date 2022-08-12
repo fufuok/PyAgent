@@ -424,12 +424,16 @@ def get_hash(data=None, hash_name='md5', salt=''):
         return ''
 
 
-def get_json_loads(s: Any, default: bool = False) -> dict:
-    """屏蔽错误, 加载 JSON"""
+def get_json_loads(s: Any, default: bool = False, *, as_file=False) -> dict:
+    """屏蔽错误, 加载 JSON 字符串或文件"""
     if isinstance(s, dict):
         return s
     try:
-        return json.loads(s)
+        if as_file:
+            with open(s, 'r') as f:
+                return json.load(f)
+        else:
+            return json.loads(s)
     except Exception:
         return {} if default is False else default
 
