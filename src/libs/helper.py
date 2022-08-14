@@ -44,11 +44,11 @@ def try_logger(depth=1, *, as_logger=True, log_tag=''):
             msg = '{} - {}'.format(log_tag, fn.__name__) if log_tag else fn.__name__
             try:
                 if as_logger:
-                    logger.opt(depth=depth).info('try {} start'.format(msg))
+                    logger.opt(depth=depth).debug('try {} start'.format(msg))
                     start = time.perf_counter()
                     res = fn(*args, **kwargs)
                     cost = time.perf_counter() - start
-                    logger.opt(depth=depth).info('try {} end, cost: {:.6f}'.format(msg, cost))
+                    logger.opt(depth=depth).debug('try {} end, cost: {:.6f}'.format(msg, cost))
                 else:
                     res = fn(*args, **kwargs)
                 return res
@@ -456,6 +456,7 @@ def get_host_ip():
 def get_dict_value(d, key_path, default=None, *, as_true=True, fix_type=True):
     """
     获取字典键值
+    源字典类型错误时, 返回默认值
     获取的结果为假时, 返回默认值
     获取的结果类型自动转换为默认值相同类型, 转换失败返回默认值, 默认值为 None 时不转换
 
