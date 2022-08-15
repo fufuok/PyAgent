@@ -93,11 +93,12 @@ class Config:
         # print(f'export PYAGENT_CONFIG_API_KEY={encrypted}')
         # 如: Linux 里执行: export PYAGENT_CONFIG_API_KEY=bbM1VU6LkCDM3pV67ELEBDvgH4YTkeoaBypVQhJYUuzwvZ
         # 程序里使用下面的代码解密后使用
-        api_key = get_environ('PYAGENT_CONFIG_API_KEY', COMMON_KEY, '')
+        node_ip = get_environ('PYAGENT_CONFIG_NODE_IP', default='')
+        api_key = get_environ('PYAGENT_CONFIG_API_KEY', COMMON_KEY, default='')
         timestamp = int(time.time())
         token = get_hash(f'{timestamp}{api_key}')
 
-        new_conf = await request(f'{update_api}?time={timestamp}&token={token}')
+        new_conf = await request(f'{update_api}?time={timestamp}&token={token}&node_ip={node_ip}')
 
         main_conf = get_dict_value(new_conf, 'data|main', {})
         host_conf = get_dict_value(new_conf, 'data|host', {})
