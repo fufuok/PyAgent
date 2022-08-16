@@ -68,7 +68,7 @@ class Worker:
 
 async def main() -> None:
     """程序入口"""
-    logger.info('PyAgent(v0.2.7.22012515) start working')
+    logger.info('PyAgent(v0.2.8.22081111) start working')
 
     while True:
         await CONF.update()
