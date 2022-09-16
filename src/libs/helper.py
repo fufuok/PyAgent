@@ -270,6 +270,10 @@ def get_date(any_dt=None, in_fmt='%Y-%m-%d', out_fmt='', default=True, add_days=
         get_date(date(year=2020, month=1, day=1))
         get_date(date(year=2020, month=1, day=1), out_fmt='datetime')
 
+        # '2021-11-05T14:00:00+08:00'
+        get_date('2021-11-05T14:00:00.283+08:00', in_fmt='iso', out_fmt='iso')
+        get_date('2021-11-05T14:00:00.000Z', in_fmt='iso', out_fmt='iso')
+
 
     :param any_dt: mixed, 输入的日期, 空/日期字符串/日期对象/时间戳
     :param in_fmt: str, 源日期格式
@@ -285,8 +289,21 @@ def get_date(any_dt=None, in_fmt='%Y-%m-%d', out_fmt='', default=True, add_days=
         dt = any_dt
     else:
         try:
-            dt = datetime.fromisoformat(str(any_dt).rstrip('Z')) if in_fmt == 'iso' \
-                else datetime.strptime(any_dt, in_fmt)
+            if in_fmt == 'iso':
+                any_dt = str(any_dt).strip()
+                in_fmt = '%Y-%m-%dT%H:%M:%S'
+                if '.' in any_dt:
+                    in_fmt += '.%f'
+                if 'Z' in any_dt:
+                    in_fmt += 'Z'
+                elif '+' in any_dt:
+                    tmp = any_dt.split('+')
+                    if len(tmp) < 2:
+                        any_dt = tmp[0]
+                    else:
+                        any_dt = tmp[0] + '+' + tmp[1].replace(':', '')
+                        in_fmt += '%z'
+            dt = datetime.strptime(any_dt, in_fmt)
         except Exception:
             timestamp = get_int(any_dt)
             if timestamp:
@@ -313,7 +330,7 @@ def get_date(any_dt=None, in_fmt='%Y-%m-%d', out_fmt='', default=True, add_days=
     if not out_fmt:
         return dt
     if out_fmt == 'iso':
-        return dt.isoformat(timespec='seconds') + '+08:00'
+        return get_iso_date(dt)
     if out_fmt == 'timestamp000':
         return int(dt.timestamp() * 1000)
     if out_fmt == 'timestamp':
@@ -331,6 +348,7 @@ def get_date(any_dt=None, in_fmt='%Y-%m-%d', out_fmt='', default=True, add_days=
 def get_iso_date(any_dt=None, in_fmt='%Y-%m-%d', zone='+08:00'):
     """
     世界时间格式, 默认当前时间
+    注: 忽略输入的时区, 结果强制为指定的时区
 
     e.g.::
 
@@ -339,12 +357,16 @@ def get_iso_date(any_dt=None, in_fmt='%Y-%m-%d', zone='+08:00'):
         get_iso_date(date(year=2020, month=1, day=1))
         get_iso_date('2020-01-01 01:02:03', in_fmt='%Y-%m-%d %H:%M:%S')
 
+        # '2021-11-05T14:00:00Z'
+        get_iso_date('2021-11-05T14:00:00.000Z', in_fmt='iso', zone='Z')
+        get_iso_date('2021-11-05T14:00:00.283+08:00', in_fmt='iso', zone='Z')
+
     :param any_dt: mixed, 输入的日期, 空/日期字符串/日期对象/时间戳
     :param in_fmt: str, 源日期格式
     :param zone:
     :return:
     """
-    return get_date(any_dt, in_fmt=in_fmt, out_fmt='datetime').isoformat(timespec='seconds') + zone
+    return get_date(any_dt, in_fmt=in_fmt, out_fmt='datetime').isoformat(timespec='seconds').split('+')[0] + zone
 
 
 def get_ymd(dt=None, in_fmt='%Y-%m-%d', out_fmt='%Y-%m-%d', default=True, add_days=0):
@@ -529,7 +551,7 @@ def get_dict_value(d, key_path, default=None, *, as_true=True, fix_type=True):
     if as_true and not value:
         return default
 
-    if fix_type:
+    if fix_type and default is not None:
         return get_same_type(default, value)
 
     return value
