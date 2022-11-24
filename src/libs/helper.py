@@ -255,7 +255,8 @@ def get_domain_host(host: Optional[str] = None):
     return host if get_extend_domain('{}.f'.format(host)) else None
 
 
-def get_date(any_dt=None, in_fmt='%Y-%m-%d', out_fmt='', default=True, add_days=0, add_hours=0, add_seconds=0):
+def get_date(any_dt=None, in_fmt='%Y-%m-%d', out_fmt='', default=True,
+             add_days=0, add_hours=0, add_minutes=0, add_seconds=0):
     """
     检查日期是否正确并返回日期
 
@@ -267,12 +268,14 @@ def get_date(any_dt=None, in_fmt='%Y-%m-%d', out_fmt='', default=True, add_days=
         get_date(out_fmt='timestamp000')
         get_date(out_fmt='date')
         get_date(out_fmt='datetime')
+        get_date(out_fmt='begin_of_minute')
         get_date(date(year=2020, month=1, day=1))
         get_date(date(year=2020, month=1, day=1), out_fmt='datetime')
 
         # '2021-11-05T14:00:00+08:00'
         get_date('2021-11-05T14:00:00.283+08:00', in_fmt='iso', out_fmt='iso')
         get_date('2021-11-05T14:00:00.000Z', in_fmt='iso', out_fmt='iso')
+        get_date('2021-11-05T14:15:16.999Z', in_fmt='iso', out_fmt='begin_of_minute')
 
 
     :param any_dt: mixed, 输入的日期, 空/日期字符串/日期对象/时间戳
@@ -281,6 +284,7 @@ def get_date(any_dt=None, in_fmt='%Y-%m-%d', out_fmt='', default=True, add_days=
     :param default: bool, True 源日期格式不正确时返回今天
     :param add_days: int, 正负数, 与输入日期相差的天数
     :param add_hours: int, 正负数, 与输入日期相差的小时数
+    :param add_minutes: int, 正负数, 与输入日期相差的分钟数
     :param add_seconds: int, 正负数, 与输入日期相差的秒数
     :return: datetime|None|str
     """
@@ -324,6 +328,9 @@ def get_date(any_dt=None, in_fmt='%Y-%m-%d', out_fmt='', default=True, add_days=
     if add_hours and isinstance(add_hours, int):
         dt = dt + timedelta(hours=add_hours)
 
+    if add_minutes and isinstance(add_minutes, int):
+        dt = dt + timedelta(minutes=add_minutes)
+
     if add_seconds and isinstance(add_seconds, int):
         dt = dt + timedelta(seconds=add_seconds)
 
@@ -341,8 +348,12 @@ def get_date(any_dt=None, in_fmt='%Y-%m-%d', out_fmt='', default=True, add_days=
         return dt
     if out_fmt == 'date':
         return dt.date() if getattr(dt, 'date', None) else dt
+    if out_fmt == 'begin_of_minute':
+        return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute)
+    if out_fmt == 'begin_of_hour':
+        return datetime(dt.year, dt.month, dt.day, dt.hour)
 
-    return datetime.strftime(dt, out_fmt)
+    return dt.strftime(out_fmt)
 
 
 def get_iso_date(any_dt=None, in_fmt='%Y-%m-%d', zone='+08:00'):
