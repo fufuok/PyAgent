@@ -182,6 +182,12 @@ def get_int(s=None, default=None, sep=None):
     :param sep: str, 指定分隔符时返回 list, e.g. [1, 7]
     :return: int / list / default
     """
+    if isinstance(s, bytes):
+        try:
+            s = s.decode('utf-8')
+        except Exception:
+            return [] if sep else default
+
     if isinstance(s, int):
         return int(s)
     elif isinstance(s, (float, Decimal)):
